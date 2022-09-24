@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AKG"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Name="window" Title="MainWindow" WindowState="Maximized" Height="450" Width="800">
     <Grid>
+        <Grid.Background>
+            <RadialGradientBrush>
+                <GradientStop Color="#FF484545" Offset="0.767"/>
+                <GradientStop Color="#FF8E8A8A" Offset="0"/>
+            </RadialGradientBrush>
+        </Grid.Background>
 
+        <Canvas Name="canvas">
+
+        </Canvas>
     </Grid>
 </Window>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace AKG
 {
@@ -20,15 +22,18 @@ namespace AKG
         {
             InitializeComponent();
 
-            TransformMatrix.width = 1920;
-            TransformMatrix.height = 1080;
+            Loaded += delegate
+            {
+                TransformMatrix.width = (float)window.ActualWidth;
+                TransformMatrix.height = (float)window.ActualHeight;
+
+                DrawModel();
+            };
 
             Model.ReadFile("Sting-Sword-lowpoly.obj");
 
             VectorTransformation.UpdateCameraBasicVectors();
             VectorTransformation.InitVectors();
-
-            DrawModel();
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -122,8 +127,6 @@ namespace AKG
                     VectorTransformation.TransformVectorsScale();
                     break;
             }
-
-            DrawModel();
         }
 
         public void DrawModel()
@@ -175,7 +178,7 @@ namespace AKG
         }
         */
 
-        private static Line DrawLine(Vector3 v1, Vector3 v2)
+        private Line DrawLine(Vector3 v1, Vector3 v2)
         {
             Line line = new Line();
 
@@ -190,14 +193,14 @@ namespace AKG
             return line;
         }
 
-        private static float GetWindowCenterWidth()
+        private float GetWindowCenterWidth()
         {
-            return TransformMatrix.width / 3;
+            return TransformMatrix.width / 2;
         }
 
-        private static float GetWindowCenterHeight()
+        private float GetWindowCenterHeight()
         {
-            return TransformMatrix.height / 3;
+            return TransformMatrix.height / 2;
         }
     }
 }

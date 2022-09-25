@@ -17,11 +17,22 @@
         <Canvas Name="canvas">
 
         </Canvas>
-        <Label Name="lbRotateX" Content="0" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
-        <Label Name="lbRotateY" Content="0" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
-        <Label Name="lbRotateZ" Content="0" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top"/>
-        <Label Name="lbZoom" Content="1" HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="10,109,750,296"></Label>
-        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualHeight}" Margin="18,135,737,270"></Label>
+
+        <Label Content="X Angle:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbRotateX" Content="0" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Y Angle:" HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbRotateY" Content="0" HorizontalAlignment="Left" Margin="69,18,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Z Angle:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbRotateZ" Content="0" HorizontalAlignment="Left" Margin="68,36,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Zoom level:" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbZoom" Content="1" HorizontalAlignment="Left" Margin="81,54,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Width:" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="60,74,700,331" Foreground="White"></Label>
+        <Label Content="Height:" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualHeight}" Margin="63,93,692,312" Foreground="White"></Label>
     </Grid>
 </Window>

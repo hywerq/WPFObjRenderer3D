@@ -26,35 +26,15 @@ namespace AKG
             }
         }
 
-        public static void TransformVectorsRotateX()
+        public static void TransformVectors()
         {
             for (int i = 0; i < Model.listV.Count; i++)
             {
                 Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixX);
-            }
-        }
+                Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.RotateMatrixY);
+                Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.RotateMatrixZ);
 
-        public static void TransformVectorsRotateY()
-        {
-            for (int i = 0; i < Model.listV.Count; i++)
-            {
-                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixY);
-            }
-        }
-
-        public static void TransformVectorsRotateZ()
-        {
-            for (int i = 0; i < Model.listV.Count; i++)
-            {
-                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixZ);
-            }
-        }
-
-        public static void TransformVectorsScale()
-        {
-            for (int i = 0; i < Model.listV.Count; i++)
-            {
-                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.ScaleMatrix);
+                Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.ScaleMatrix);
             }
         }
     }

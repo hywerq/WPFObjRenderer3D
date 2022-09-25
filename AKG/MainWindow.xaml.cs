@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace AKG
 {
@@ -50,6 +48,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixX.M33 = (float)Math.Cos(angleX);
 
                     VectorTransformation.TransformVectorsRotateX();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.S:
                     angleX -= 0.1;
@@ -61,6 +60,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixX.M33 = (float)Math.Cos(angleX);
 
                     VectorTransformation.TransformVectorsRotateX();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.A:
                     angleY += 0.1;
@@ -72,6 +72,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixY.M33 = (float)Math.Cos(angleY);
 
                     VectorTransformation.TransformVectorsRotateY();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.D:
                     angleY -= 0.1;
@@ -83,6 +84,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixY.M33 = (float)Math.Cos(angleY);
 
                     VectorTransformation.TransformVectorsRotateY();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.Q:
                     angleZ += 0.1;
@@ -94,6 +96,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixZ.M33 = (float)Math.Cos(angleZ);
 
                     VectorTransformation.TransformVectorsRotateZ();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.E:
                     angleZ -= 0.1;
@@ -105,6 +108,7 @@ namespace AKG
                     TransformMatrix.RotateMatrixZ.M22 = (float)Math.Cos(angleZ);
 
                     VectorTransformation.TransformVectorsRotateZ();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.I:
                     zoom += 0.1;
@@ -115,6 +119,7 @@ namespace AKG
                     TransformMatrix.ScaleMatrix.M33 = (float)zoom;
 
                     VectorTransformation.TransformVectorsScale();
+                    DrawModel();
                     break;
                 case System.Windows.Input.Key.K:
                     zoom -= 0.1;
@@ -125,6 +130,7 @@ namespace AKG
                     TransformMatrix.ScaleMatrix.M33 = (float)zoom;
 
                     VectorTransformation.TransformVectorsScale();
+                    DrawModel();
                     break;
             }
         }

@@ -1,11 +1,8 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Collections.Generic;
-using System;
 
 namespace AKG
 {
@@ -14,11 +11,10 @@ namespace AKG
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static double MaxDepth, MinDepth, focus;
         private static double angleX = 0;
         private static double angleY = 0;
         private static double angleZ = 0;
-        private static double zoom = 1;
+        private static double zoom = 10;
 
         public MainWindow()
         {
@@ -133,17 +129,12 @@ namespace AKG
         public void DrawModel()
         {
             canvas.Children.Clear();
-            FindMinMaxDepth();
 
             foreach (var vector in Model.listF)
             {
-                canvas.Children.Add(DrawLine(Model.listV[vector[0] - 1], Model.listV[vector[3] - 1], false));
-                canvas.Children.Add(DrawLine(Model.listV[vector[3] - 1], Model.listV[vector[6] - 1], false));
-                canvas.Children.Add(DrawLine(Model.listV[vector[6] - 1], Model.listV[vector[0] - 1], false));
-
-                //canvas.Children.Add(DrawLine(Model.listV[vector[0] - 1], Model.listV[vector[3] - 1]));
-                //canvas.Children.Add(DrawLine(Model.listV[vector[3] - 1], Model.listV[vector[6] - 1]));
-                //canvas.Children.Add(DrawLine(Model.listV[vector[6] - 1], Model.listV[vector[0] - 1]));
+                canvas.Children.Add(DrawLine(Model.listV[vector[0] - 1], Model.listV[vector[3] - 1]));
+                canvas.Children.Add(DrawLine(Model.listV[vector[3] - 1], Model.listV[vector[6] - 1]));
+                canvas.Children.Add(DrawLine(Model.listV[vector[6] - 1], Model.listV[vector[0] - 1]));
             }
         }
 
@@ -184,68 +175,29 @@ namespace AKG
         }
         */
 
-
-
-        private static Line DrawLine(Vector3 v1, Vector3 v2, bool perspective)
+        private static Line DrawLine(Vector3 v1, Vector3 v2)
         {
-            Line l = new Line();
+            Line line = new Line();
 
-            l.HorizontalAlignment = HorizontalAlignment.Left;
-            l.VerticalAlignment = VerticalAlignment.Top;
-            l.X1 = ConvertX(v1.X, v1.Y, TransformMatrix.width / 2, perspective);
-            l.Y1 = ConvertY(v1.Z, v1.Y, TransformMatrix.height / 2, perspective);
-            l.X2 = ConvertX(v2.X, v2.Y, TransformMatrix.width / 2, perspective);
-            l.Y2 = ConvertY(v2.Z, v2.Y, TransformMatrix.height / 2, perspective);
-            l.Stroke = Brushes.Beige;
-            l.StrokeThickness = 1;
+            line.Stroke = Brushes.Beige;
+            line.StrokeThickness = 1;
 
-            return l;
+            line.X1 = v1.X * zoom + GetWindowCenterWidth();
+            line.Y1 = v1.Y * zoom + GetWindowCenterHeight();
+            line.X2 = v2.X * zoom + GetWindowCenterWidth();
+            line.Y2 = v2.Y * zoom + GetWindowCenterHeight();
+
+            return line;
         }
 
-        private static double ConvertX(double x, double depth, double center, bool perspective)
+        private static float GetWindowCenterWidth()
         {
-            double k;
-
-            if (perspective)
-            {
-                k = (focus - depth) / (focus - MinDepth);
-            }
-            else k = 1;
-
-            var buf = x * 0.0001 * k + center;
-            return buf;
+            return TransformMatrix.width / 3;
         }
 
-        private static double ConvertY(double y, double depth, double center, bool perspective)
+        private static float GetWindowCenterHeight()
         {
-            double k;
-
-            if (perspective)
-                k = (focus - depth) / (focus - MinDepth);
-            else k = 1;
-
-            var buf = -y * 0.0001 * k + center;
-            return buf;
+            return TransformMatrix.height / 3;
         }
-
-        private static void FindMinMaxDepth()
-        {
-            MaxDepth = 0;
-            MinDepth = 0;
-
-            foreach (var item in Model.listF)
-            {
-                for (int i = 0; i < item.Length; i += 3)
-                {
-                    Vector3 v1 = Model.listV[item[i] - 1];
-                    if (v1.Y < MinDepth)
-                        MinDepth = v1.Y;
-                    if (v1.Y > MaxDepth)
-                        MaxDepth = v1.Y;
-                }
-            }
-            focus = (MaxDepth - MinDepth) * 4;
-        }
-
     }
 }

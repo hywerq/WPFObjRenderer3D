@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AKG"
         mc:Ignorable="d"
-        Name="window" Title="MainWindow" WindowState="Maximized" Height="450" Width="800" KeyDown="window_KeyDown">
+        Name="window" Title="MainWindow" WindowState="Maximized" Height="1080" Width="1920" KeyDown="window_KeyDown">
     <Grid>
         <Grid.Background>
             <RadialGradientBrush>
@@ -21,5 +21,7 @@
         <Label Name="lbRotateY" Content="0" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
         <Label Name="lbRotateZ" Content="0" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top"/>
         <Label Name="lbZoom" Content="1" HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="10,109,750,296"></Label>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualHeight}" Margin="18,135,737,270"></Label>
     </Grid>
 </Window>

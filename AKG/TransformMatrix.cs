@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Windows.Controls;
 using static AKG.VectorTransformation;
 
 namespace AKG
@@ -86,13 +85,5 @@ namespace AKG
             0, 0, 1.0f, 0,
             0, 0, 0, 1.0f
         );
-
-        /*        public static float[,] EulerBrick =
-        {
-                    { 0, 0, 0, 0 },
-                    { 0, 0, 0, 0 },
-                    { 0, 0, 0, 0 },
-                    { 0, 0, 0, 0 },
-                };*/
     }
 }

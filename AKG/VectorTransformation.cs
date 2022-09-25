@@ -4,7 +4,7 @@ namespace AKG
 {
     public static class VectorTransformation
     {
-        public static Vector3 XAxis = new Vector3(120.0f, 0.0f, 0.0f );
+        public static Vector3 XAxis = new Vector3(120.0f, 0.0f, 0.0f);
         public static Vector3 YAxis = new Vector3(0.0f, 160.0f, 0.0f);
         public static Vector3 ZAxis = new Vector3(200.0f, 0.0f, 200.0f);
 
@@ -14,22 +14,47 @@ namespace AKG
             XAxis = Vector3.Normalize(TransformMatrix.up * ZAxis);
             YAxis = TransformMatrix.up;
         }
-
-        private static void TransformVector(Vector3 vector, Vector3[,] matrix)
+        
+        public static void InitVectors()
         {
-/*            vector.X = vector.X * matrix[0, 0] + vector.Y * matrix[0, 1] + vector.Z * matrix[0, 2];
-            vector.Y = vector.X * matrix[1, 0] + vector.Y * matrix[1, 1] + vector.Z * matrix[1, 2];
-            vector.Z = vector.X * matrix[2, 0] + vector.Y * matrix[2, 1] + vector.Z * matrix[2, 2];*/
+            for (int i = 0; i < Model.listV.Count; i++)
+            {
+                //Vector3.Transform(vector, TransformMatrix.PerspectiveProjection);
+                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.Viewport);
+                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.AnglePerspectiveProjection);
+                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.View);
+            }
         }
 
-        public static void TransformVectors()
+        public static void TransformVectorsRotateX()
         {
-            foreach(var vector in Model.listV)
+            for (int i = 0; i < Model.listV.Count; i++)
             {
-                Vector3.Transform(vector, TransformMatrix.PerspectiveProjection);
-                //Vector3.Transform(vector, TransformMatrix.OrthographicProjection);
-                Vector3.Transform(vector, TransformMatrix.AnglePerspectiveProjection);
-                Vector3.Transform(vector, TransformMatrix.Viewport);
+                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixX);
+            }
+        }
+
+        public static void TransformVectorsRotateY()
+        {
+            for (int i = 0; i < Model.listV.Count; i++)
+            {
+                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixY);
+            }
+        }
+
+        public static void TransformVectorsRotateZ()
+        {
+            for (int i = 0; i < Model.listV.Count; i++)
+            {
+                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixZ);
+            }
+        }
+
+        public static void TransformVectorsScale()
+        {
+            for (int i = 0; i < Model.listV.Count; i++)
+            {
+                Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.ScaleMatrix);
             }
         }
     }

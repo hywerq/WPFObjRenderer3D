@@ -11,12 +11,9 @@ namespace AKG
         public static Vector3 target = new Vector3(500.0f, 100.0f, 0.0f);
         public static Vector3 up = new Vector3(1000.0f, 0.0f, 100.0f);
 
-        private static Vector3 zero = new Vector3(0.0f, 0.0f, 0.0f);
-        private static Vector3 one = new Vector3(1.0f, 1.0f, 1.0f);
-
         public static float width;
         public static float height;
-        
+
         private static float near = 100.0f;
         private static float far = 600.0f;
 
@@ -26,13 +23,13 @@ namespace AKG
         private static float fov = 300.0f;
         private static float aspect = 300.0f;
 
-        public static Vector3[,] ObserverSpace = 
-        {
-            { XAxis, XAxis, XAxis, -(XAxis * eye) },
-            { YAxis, YAxis, YAxis, -(YAxis * eye) },
-            { ZAxis, ZAxis, ZAxis, -(ZAxis * eye) },
-            { zero, zero, zero, one },
-        };
+        public static Matrix4x4 View = new
+        (
+            XAxis.X, XAxis.Y, XAxis.Z, -(XAxis.X * eye.X + XAxis.Y * eye.Y + XAxis.Z * eye.Z),
+            YAxis.X, YAxis.Y, YAxis.Z, -(YAxis.X * eye.X + YAxis.Y * eye.Y + YAxis.Z * eye.Z),
+            ZAxis.X, ZAxis.Y, ZAxis.Z, -(ZAxis.X * eye.X + ZAxis.Y * eye.Y + ZAxis.Z * eye.Z),
+            0, 0, 0, 1
+        );
 
         public static Matrix4x4 OrthographicProjection = new (
             (2.0f / width), 0, 0, 0,
@@ -58,6 +55,34 @@ namespace AKG
         public static Matrix4x4 Viewport = new(
             (width / 2.0f), 0, 0, (x_min + width / 2.0f),
             0, (-height / 2.0f), 0, (y_min + height / 2.0f),
+            0, 0, 1.0f, 0,
+            0, 0, 0, 1.0f
+        );
+
+        public static Matrix4x4 RotateMatrixX = new(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
+            0, 0, 1.0f, 0,
+            0, 0, 0, 1.0f
+        );
+
+        public static Matrix4x4 RotateMatrixY = new(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
+            0, 0, 1.0f, 0,
+            0, 0, 0, 1.0f
+        );
+
+        public static Matrix4x4 RotateMatrixZ = new(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
+            0, 0, 1.0f, 0,
+            0, 0, 0, 1.0f
+        );
+
+        public static Matrix4x4 ScaleMatrix = new(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
             0, 0, 1.0f, 0,
             0, 0, 0, 1.0f
         );

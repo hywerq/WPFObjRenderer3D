@@ -4,9 +4,9 @@ namespace AKG
 {
     public static class VectorTransformation
     {
-        public static Vector3 XAxis = new Vector3(10.0f, 0.0f, 0.0f);
-        public static Vector3 YAxis = new Vector3(0.0f, 10.0f, 0.0f);
-        public static Vector3 ZAxis = new Vector3(0.0f, 0.0f, 10.0f);
+        public static Vector3 XAxis = new Vector3(0.0f, 0.0f, 0.0f);
+        public static Vector3 YAxis = new Vector3(0.0f, 0.0f, 0.0f);
+        public static Vector3 ZAxis = new Vector3(0.0f, 0.0f, 0.0f);
 
         public static void UpdateCameraBasicVectors()
         {

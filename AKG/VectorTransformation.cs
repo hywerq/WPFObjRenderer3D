@@ -39,15 +39,19 @@ namespace AKG
             //    Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.MoveMatrix);
             //}
 
-            Matrix4x4 mx_Model = Matrix4x4.Multiply(
-                Matrix4x4.Multiply(TransformMatrix.MoveMatrix,
-                    Matrix4x4.Multiply(
-                        Matrix4x4.Multiply(TransformMatrix.RotateMatrixX, TransformMatrix.RotateMatrixY),
-                        TransformMatrix.RotateMatrixZ)),
-                    TransformMatrix.ScaleMatrix);
+            //Matrix4x4 mx_Model = Matrix4x4.Multiply(
+            //    Matrix4x4.Multiply(TransformMatrix.MoveMatrix,
+            //        Matrix4x4.Multiply(
+            //            Matrix4x4.Multiply(TransformMatrix.RotateMatrixX, TransformMatrix.RotateMatrixY),
+            //            TransformMatrix.RotateMatrixZ)),
+            //        TransformMatrix.ScaleMatrix);
 
             Matrix4x4 Projection_View = Matrix4x4.Multiply(TransformMatrix.AnglePerspectiveProjection, TransformMatrix.View);
-            Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View, mx_Model);
+            Matrix4x4 Projection_View_Scale = Matrix4x4.Multiply(Projection_View, TransformMatrix.ScaleMatrix);
+            Matrix4x4 Projection_View_Scale_Rotation_X = Matrix4x4.Multiply(Projection_View_Scale, TransformMatrix.RotateMatrixX);
+            Matrix4x4 Projection_View_Scale_Rotation_Y = Matrix4x4.Multiply(Projection_View_Scale_Rotation_X, TransformMatrix.RotateMatrixY);
+            Matrix4x4 Projection_View_Scale_Rotation_Z = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Y, TransformMatrix.RotateMatrixZ);
+            Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Z, TransformMatrix.MoveMatrix);
 
             for (int i = 0; i < Model.listV.Count; i++)
             {

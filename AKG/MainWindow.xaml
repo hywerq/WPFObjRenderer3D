@@ -30,6 +30,9 @@
         <Label Content="Zoom level:" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbZoom" Content="1" HorizontalAlignment="Left" Margin="81,54,0,0" VerticalAlignment="Top" Foreground="White"/>
 
+        <Label Content="World position:" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbPos" Content="0, 0, 0" HorizontalAlignment="Left" Margin="101,113,0,0" VerticalAlignment="Top" Foreground="White"/>
+
         <Label Content="Width:" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="60,74,700,331" Foreground="White"></Label>
         <Label Content="Height:" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Foreground="White"/>

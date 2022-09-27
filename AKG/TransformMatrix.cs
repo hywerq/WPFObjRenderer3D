@@ -6,21 +6,21 @@ namespace AKG
 {
     public static class TransformMatrix
     {
-        public static Vector3 eye = new Vector3(600.0f, 700.0f, 0.0f);
-        public static Vector3 target = new Vector3(500.0f, 100.0f, 0.0f);
-        public static Vector3 up = new Vector3(1000.0f, 0.0f, 100.0f);
+        public static Vector3 eye = new Vector3(6.0f, 7.0f, 0.0f);
+        public static Vector3 target = new Vector3(5.0f, 1.0f, 0.0f);
+        public static Vector3 up = new Vector3(1.0f, 0.0f, 1.0f);
 
         public static float width;
         public static float height;
 
-        private static float near = 100.0f;
-        private static float far = 600.0f;
+        private static float near = 1.0f;
+        private static float far = 6.0f;
 
-        private static float x_min = 300.0f;
-        private static float y_min = 300.0f;
+        private static float x_min = 3.0f;
+        private static float y_min = 3.0f;
 
-        private static float fov = 300.0f;
-        private static float aspect = 300.0f;
+        private static float fov = 3.0f;
+        private static float aspect = 3.0f;
 
         public static Matrix4x4 View = new
         (
@@ -80,6 +80,13 @@ namespace AKG
         );
 
         public static Matrix4x4 ScaleMatrix = new(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
+            0, 0, 1.0f, 0,
+            0, 0, 0, 1.0f
+        );
+
+        public static Matrix4x4 MoveMatrix = new(
             1.0f, 0, 0, 0,
             0, 1.0f, 0, 0,
             0, 0, 1.0f, 0,

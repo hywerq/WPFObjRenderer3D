@@ -16,6 +16,7 @@ namespace AKG
         private static double angleZ = 0;
         private static double zoom = 0.0001;
         private static double zoom_level = 0.0001;
+        private static float[] movment = { 0, 0, 0 };
 
         public MainWindow()
         {
@@ -32,14 +33,14 @@ namespace AKG
             Model.ReadFile("Sting-Sword-lowpoly.obj");
 
             VectorTransformation.UpdateCameraBasicVectors();
-            VectorTransformation.InitVectors();
+            VectorTransformation.TransformVectors();
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             switch (e.Key)
             {
-                case System.Windows.Input.Key.W:
+                case System.Windows.Input.Key.I:
                     angleX += 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
@@ -51,7 +52,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.S:
+                case System.Windows.Input.Key.K:
                     angleX -= 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
@@ -63,7 +64,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.A:
+                case System.Windows.Input.Key.J:
                     angleY += 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
@@ -75,7 +76,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.D:
+                case System.Windows.Input.Key.L:
                     angleY -= 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
@@ -87,7 +88,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.Q:
+                case System.Windows.Input.Key.U:
                     angleZ += 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
@@ -99,7 +100,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.E:
+                case System.Windows.Input.Key.O:
                     angleZ -= 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
@@ -111,7 +112,7 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.I:
+                case System.Windows.Input.Key.T:
                     zoom += zoom_level;
                     lbZoom.Content = zoom.ToString("#.#####");
 
@@ -122,13 +123,79 @@ namespace AKG
                     VectorTransformation.TransformVectors();
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.K:
+                case System.Windows.Input.Key.G:
                     zoom -= zoom_level;
                     lbZoom.Content = zoom.ToString("#.#####");
 
                     TransformMatrix.ScaleMatrix.M11 = (float)zoom;
                     TransformMatrix.ScaleMatrix.M22 = (float)zoom;
                     TransformMatrix.ScaleMatrix.M33 = (float)zoom;
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.W:
+                    movment[0] += 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.S:
+                    movment[0] -= 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.A:
+                    movment[1] -= 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.D:
+                    movment[1] += 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.E:
+                    movment[2] += 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
+
+                    VectorTransformation.TransformVectors();
+                    DrawModel();
+                    break;
+                case System.Windows.Input.Key.Q:
+                    movment[2] -= 1;
+                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+
+                    TransformMatrix.MoveMatrix.M14 = movment[0];
+                    TransformMatrix.ScaleMatrix.M24 = movment[1];
+                    TransformMatrix.ScaleMatrix.M34 = movment[2];
 
                     VectorTransformation.TransformVectors();
                     DrawModel();

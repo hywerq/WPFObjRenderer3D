@@ -16,8 +16,8 @@ namespace AKG
         private static float near = 1.0f;
         private static float far = 6.0f;
 
-        private static float x_min = 3.0f;
-        private static float y_min = 3.0f;
+        public static float x_min = 3.0f;
+        public static float y_min = 3.0f;
 
         private static float fov = 3.0f;
         private static float aspect = 3.0f;

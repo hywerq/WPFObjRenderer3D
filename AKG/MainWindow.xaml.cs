@@ -14,8 +14,8 @@ namespace AKG
         private static double angleX = 0;
         private static double angleY = 0;
         private static double angleZ = 0;
-        private static double zoom = 0.0001;
-        private static double zoom_level = 0.0001;
+        private static double zoom = 0.0000001;
+        private static double zoom_level = 0.0000001;
         private static float[] movment = { 0, 0, 0 };
 
         public MainWindow()
@@ -27,13 +27,13 @@ namespace AKG
                 TransformMatrix.width = (float)window.ActualWidth;
                 TransformMatrix.height = (float)window.ActualHeight;
 
+                Model.ReadFile("Sting-Sword-lowpoly.obj");
+
+                VectorTransformation.UpdateCameraBasicVectors();
+                VectorTransformation.TransformVectors();
+
                 DrawModel();
             };
-
-            Model.ReadFile("Sting-Sword-lowpoly.obj");
-
-            VectorTransformation.UpdateCameraBasicVectors();
-            VectorTransformation.TransformVectors();
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

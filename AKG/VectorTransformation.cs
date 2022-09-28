@@ -15,16 +15,16 @@ namespace AKG
             YAxis = TransformMatrix.up;
         }
         
-        public static void InitVectors()
-        {
-            for (int i = 0; i < Model.listV.Count; i++)
-            {
-                //Vector3.Transform(vector, TransformMatrix.PerspectiveProjection);
-                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.Viewport);
-                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.AnglePerspectiveProjection);
-                //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.View);
-            }
-        }
+        //public static void InitVectors()
+        //{
+        //    for (int i = 0; i < Model.listV.Count; i++)
+        //    {
+        //        //Vector3.Transform(vector, TransformMatrix.PerspectiveProjection);
+        //        //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.Viewport);
+        //        //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.AnglePerspectiveProjection);
+        //        //Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.View);
+        //    }
+        //}
 
         public static void TransformVectors()
         {
@@ -52,6 +52,11 @@ namespace AKG
             //Matrix4x4 Projection_View_Scale_Rotation_Y = Matrix4x4.Multiply(Projection_View_Scale_Rotation_X, TransformMatrix.RotateMatrixY);
             //Matrix4x4 Projection_View_Scale_Rotation_Z = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Y, TransformMatrix.RotateMatrixZ);
             //Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Z, TransformMatrix.MoveMatrix);
+
+            TransformMatrix.Viewport.M11 = (TransformMatrix.width / 2.0f);
+            TransformMatrix.Viewport.M14 = (TransformMatrix.x_min + TransformMatrix.width / 2.0f);
+            TransformMatrix.Viewport.M22 = (-TransformMatrix.height / 2.0f);
+            TransformMatrix.Viewport.M24 = (-TransformMatrix.y_min + -TransformMatrix.height / 2.0f);
 
             Matrix4x4 Projection_View = Matrix4x4.Multiply(TransformMatrix.AnglePerspectiveProjection, TransformMatrix.View);
             Matrix4x4 Projection_View_Move = Matrix4x4.Multiply(Projection_View, TransformMatrix.MoveMatrix);

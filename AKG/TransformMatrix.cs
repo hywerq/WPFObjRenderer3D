@@ -6,21 +6,21 @@ namespace AKG
 {
     public static class TransformMatrix
     {
-        public static Vector3 eye = new Vector3(1.0f, 1.0f, 1.0f);
-        public static Vector3 target = new Vector3(5.0f, 1.0f, 1.0f);
-        public static Vector3 up = new Vector3(1.0f, 1.0f, 1.0f);
+        public static Vector3 eye = new Vector3(0.0f, 0.0f, 100.0f);
+        public static Vector3 target = new Vector3(0.0f, 0.0f, 0.0f);
+        public static Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 
-        public static float width;
-        public static float height;
+        public static float width = 1;
+        public static float height = 1;
 
-        private static float near = 1.0f;
-        private static float far = 6.0f;
+        public static float near = 1.0f;
+        public static float far = 100.0f;
 
-        public static float x_min = 3.0f;
-        public static float y_min = 3.0f;
+        public static float x_min = 0.0f;
+        public static float y_min = 0.0f;
 
-        private static float fov = 3.0f;
-        private static float aspect = 3.0f;
+        public static float fov = MathF.PI / 4;
+        public static float aspect = width / height;
 
         public static Matrix4x4 View = new
         (
@@ -52,10 +52,10 @@ namespace AKG
         );
 
         public static Matrix4x4 Viewport = new(
-            (width / 2.0f), 0, 0, (x_min + width / 2.0f),
-            0, (-height / 2.0f), 0, (y_min + height / 2.0f),
+            (width / 2.0f), 0, 0, 0,
+            0, (-height / 2.0f), 0, 0,
             0, 0, 1.0f, 0,
-            0, 0, 0, 1.0f
+            (x_min + width / 2.0f), (y_min + height / 2.0f), 0, 1.0f
         );
 
         public static Matrix4x4 RotateMatrixX = new(

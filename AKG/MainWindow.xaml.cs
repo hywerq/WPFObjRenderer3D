@@ -14,8 +14,8 @@ namespace AKG
         private static double angleX = 0;
         private static double angleY = 0;
         private static double angleZ = 0;
-        private static double zoom = 0.00001;
-        private static double zoom_level = 0.00001;
+        private static double zoom = 1;
+        private static double zoom_level = 0.1;
         private static float[] movment = { 0, 0, 0 };
 
         public MainWindow()
@@ -32,7 +32,7 @@ namespace AKG
                 VectorTransformation.UpdateViewPort();
 
                 VectorTransformation.UpdateCameraBasicVectors();
-                VectorTransformation.TransformVectors();
+                VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
 
                 DrawModel();
             };
@@ -46,160 +46,98 @@ namespace AKG
                     angleX += 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixX.M22 = (float)Math.Cos(angleX);
-                    TransformMatrix.RotateMatrixX.M23 = -(float)Math.Sin(angleX);
-                    TransformMatrix.RotateMatrixX.M32 = (float)Math.Sin(angleX);
-                    TransformMatrix.RotateMatrixX.M33 = (float)Math.Cos(angleX);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.K:
                     angleX -= 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixX.M22 = (float)Math.Cos(angleX);
-                    TransformMatrix.RotateMatrixX.M23 = -(float)Math.Sin(angleX);
-                    TransformMatrix.RotateMatrixX.M32 = (float)Math.Sin(angleX);
-                    TransformMatrix.RotateMatrixX.M33 = (float)Math.Cos(angleX);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.J:
                     angleY += 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixY.M11 = (float)Math.Cos(angleY);
-                    TransformMatrix.RotateMatrixY.M13 = (float)Math.Sin(angleY);
-                    TransformMatrix.RotateMatrixY.M31 = -(float)Math.Sin(angleY);
-                    TransformMatrix.RotateMatrixY.M33 = (float)Math.Cos(angleY);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.L:
                     angleY -= 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixY.M11 = (float)Math.Cos(angleY);
-                    TransformMatrix.RotateMatrixY.M13 = (float)Math.Sin(angleY);
-                    TransformMatrix.RotateMatrixY.M31 = -(float)Math.Sin(angleY);
-                    TransformMatrix.RotateMatrixY.M33 = (float)Math.Cos(angleY);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.U:
                     angleZ += 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixZ.M11 = (float)Math.Cos(angleZ);
-                    TransformMatrix.RotateMatrixZ.M13 = (float)Math.Sin(angleZ);
-                    TransformMatrix.RotateMatrixZ.M31 = -(float)Math.Sin(angleZ);
-                    TransformMatrix.RotateMatrixZ.M33 = (float)Math.Cos(angleZ);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.O:
                     angleZ -= 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
-                    TransformMatrix.RotateMatrixZ.M11 = (float)Math.Cos(angleZ);
-                    TransformMatrix.RotateMatrixZ.M12 = -(float)Math.Sin(angleZ);
-                    TransformMatrix.RotateMatrixZ.M21 = (float)Math.Sin(angleZ);
-                    TransformMatrix.RotateMatrixZ.M22 = (float)Math.Cos(angleZ);
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.T:
                     zoom += zoom_level;
                     lbZoom.Content = zoom.ToString("#.#####");
 
-                    TransformMatrix.ScaleMatrix.M11 = (float)zoom;
-                    TransformMatrix.ScaleMatrix.M22 = (float)zoom;
-                    TransformMatrix.ScaleMatrix.M33 = (float)zoom;
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.G:
                     zoom -= zoom_level;
                     lbZoom.Content = zoom.ToString("#.#####");
 
-                    TransformMatrix.ScaleMatrix.M11 = (float)zoom;
-                    TransformMatrix.ScaleMatrix.M22 = (float)zoom;
-                    TransformMatrix.ScaleMatrix.M33 = (float)zoom;
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.W:
                     movment[0] += 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.S:
                     movment[0] -= 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.A:
                     movment[1] -= 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.D:
                     movment[1] += 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.E:
                     movment[2] += 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.Q:
                     movment[2] -= 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
-                    TransformMatrix.MoveMatrix.M14 = movment[0];
-                    TransformMatrix.ScaleMatrix.M24 = movment[1];
-                    TransformMatrix.ScaleMatrix.M34 = movment[2];
-
-                    VectorTransformation.TransformVectors();
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)zoom, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
             }
@@ -211,9 +149,10 @@ namespace AKG
 
             foreach (var vector in Model.listF)
             {
-                canvas.Children.Add(DrawLine(Model.listV[vector[0] - 1], Model.listV[vector[3] - 1]));
-                canvas.Children.Add(DrawLine(Model.listV[vector[3] - 1], Model.listV[vector[6] - 1]));
-                canvas.Children.Add(DrawLine(Model.listV[vector[6] - 1], Model.listV[vector[0] - 1]));
+                canvas.Children.Add(DrawLine(Model.model[vector[0] - 1], Model.model[vector[3] - 1]));
+                canvas.Children.Add(DrawLine(Model.model[vector[3] - 1], Model.model[vector[6] - 1]));
+                canvas.Children.Add(DrawLine(Model.model[vector[6] - 1], Model.model[vector[9] - 1]));
+                canvas.Children.Add(DrawLine(Model.model[vector[9] - 1], Model.model[vector[0] - 1]));
             }
         }
 
@@ -254,7 +193,7 @@ namespace AKG
         }
         */
 
-        private Line DrawLine(Vector3 v1, Vector3 v2)
+        private Line DrawLine(Vector4 v1, Vector4 v2)
         {
             Line line = new Line();
 

@@ -15,8 +15,8 @@ namespace AKG
         private static double angleX = -1;
         private static double angleY = 0;
         private static double angleZ = 0;
-        private static double scale = 0.0000001;
-        private static double scale_level = 0.0000001;
+        private static double scale = 0.000001;
+        private static double scale_level = 0.000001;
         private static float[] movment = { 0, 0, 0 };
 
         public MainWindow()

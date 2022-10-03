@@ -12,7 +12,7 @@ namespace AKG
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static double angleX = 0;
+        private static double angleX = -1;
         private static double angleY = 0;
         private static double angleZ = 0;
         private static double scale = 0.0000001;
@@ -28,7 +28,7 @@ namespace AKG
                 TransformMatrix.width = (float)img.ActualWidth;
                 TransformMatrix.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\Sting-Sword-lowpoly.obj");
+                Model.ReadFile("..\\..\\..\\objects\\hollow.obj");
 
                 VectorTransformation.UpdateViewPort();
 
@@ -99,28 +99,28 @@ namespace AKG
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.W:
+                case System.Windows.Input.Key.D:
                     movment[0] += 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.S:
+                case System.Windows.Input.Key.A:
                     movment[0] -= 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.A:
+                case System.Windows.Input.Key.S:
                     movment[1] -= 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
                     DrawModel();
                     break;
-                case System.Windows.Input.Key.D:
+                case System.Windows.Input.Key.W:
                     movment[1] += 1;
                     lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
 
@@ -151,10 +151,21 @@ namespace AKG
 
             foreach (var vector in Model.listF)
             {
-                DrawVector(bitmap, Model.model[vector[0] - 1], Model.model[vector[3] - 1]);
-                DrawVector(bitmap, Model.model[vector[3] - 1], Model.model[vector[6] - 1]);
-                DrawVector(bitmap, Model.model[vector[6] - 1], Model.model[vector[9] - 1]);
-                DrawVector(bitmap, Model.model[vector[9] - 1], Model.model[vector[0] - 1]);
+                if (vector.Length > 3)
+                {
+                    int i;
+                    for (i = 0; i < vector.Length / 3; i += 3)
+                    {
+                        DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[i + 3] - 1]);
+                    }
+                    DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
+                }
+                else
+                {
+                    DrawVector(bitmap, Model.model[vector[0] - 1], Model.model[vector[1] - 1]);
+                    DrawVector(bitmap, Model.model[vector[1] - 1], Model.model[vector[2] - 1]);
+                    DrawVector(bitmap, Model.model[vector[2] - 1], Model.model[vector[0] - 1]);
+                }
             }
         }
 
@@ -177,22 +188,7 @@ namespace AKG
         }
 
 
-        // Working, but slow
-        //public void DrawModel()
-        //{
-        //    canvas.Children.Clear();
-
-        //    foreach (var vector in Model.listF)
-        //    {
-        //        canvas.Children.Add(DrawLine(Model.model[vector[0] - 1], Model.model[vector[3] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[3] - 1], Model.model[vector[6] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[6] - 1], Model.model[vector[9] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[9] - 1], Model.model[vector[0] - 1]));
-        //    }
-        //}
-
-
-        // Attempt in fast drawing, failed one
+        // Fastest, but doesn't work properly
         //public void DrawModel()
         //{
         //    WriteableBitmap bitmap = new((int)TransformMatrix.width, (int)TransformMatrix.height, 96, 96, PixelFormats.Bgra32, null);
@@ -200,13 +196,15 @@ namespace AKG
 
         //    foreach (var vector in Model.listF)
         //    {
-        //        DrawVector(bitmap, Model.model[vector[0] - 1], Model.model[vector[3] - 1]);
-        //        DrawVector(bitmap, Model.model[vector[3] - 1], Model.model[vector[6] - 1]);
-        //        DrawVector(bitmap, Model.model[vector[6] - 1], Model.model[vector[9] - 1]);
-        //        DrawVector(bitmap, Model.model[vector[9] - 1], Model.model[vector[0] - 1]);
+        //        int i;
+        //        for (i = 0; i < vector.Length / 3; i += 3)
+        //        {
+        //            DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[i + 3] - 1]);
+        //        }
+        //        DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
         //    }
 
-        //    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight)); 
+        //    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
         //    bitmap.Unlock();
 
         //    img.Source = bitmap;
@@ -214,20 +212,20 @@ namespace AKG
 
         //public void DrawVector(WriteableBitmap bitmap, Vector4 v1, Vector4 v2)
         //{
-        //    Vector4 v = v2 - v1;
-        //    int num_of_points = 100;
-        //    for (int i = 0; i < num_of_points; i++)
+        //    float x = v1.X;
+        //    float y = v1.Y;
+
+        //    float L = Math.Abs(v1.X - v2.X) > Math.Abs(v1.Y - v2.Y) ? Math.Abs(v1.X - v2.X) : Math.Abs(v1.Y - v2.Y);
+
+        //    for (int i = 0; i < L; i++)
         //    {
-        //        var smth = (v / num_of_points) * i;
-        //        var a = smth.X;
-        //        var b = smth.Y;
-        //        lbRotateX.Content += a + " ";
-        //        lbRotateY.Content += b + " ";
-        //        //DrawPixel(bitmap, smth.X, smth.Y);
+        //        x += (v1.X - v2.X) / L;
+        //        y += (v1.Y - v2.Y) / L;
+        //        DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)));
         //    }
         //}
 
-        //public unsafe void DrawPixel(WriteableBitmap bitmap, byte x, byte y)
+        //private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y)
         //{
         //    byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
@@ -275,7 +273,20 @@ namespace AKG
         //}
 
 
-        // Depricated
+        // Working, but slow
+        //public void DrawModel()
+        //{
+        //    canvas.Children.Clear();
+
+        //    foreach (var vector in Model.listF)
+        //    {
+        //        canvas.Children.Add(DrawLine(Model.model[vector[0] - 1], Model.model[vector[3] - 1]));
+        //        canvas.Children.Add(DrawLine(Model.model[vector[3] - 1], Model.model[vector[6] - 1]));
+        //        canvas.Children.Add(DrawLine(Model.model[vector[6] - 1], Model.model[vector[9] - 1]));
+        //        canvas.Children.Add(DrawLine(Model.model[vector[9] - 1], Model.model[vector[0] - 1]));
+        //    }
+        //}
+
         //private Line DrawLine(Vector4 v1, Vector4 v2)
         //{
         //    Line line = new Line();

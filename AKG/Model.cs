@@ -46,10 +46,32 @@ namespace AKG
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList(); 
                     */
 
-                    listF = vertices
-                        .Where(x => x.StartsWith('f') == true)
-                        .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
-                        .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
+                    // Depricated?
+                    //listF = vertices
+                    //    .Where(x => x.StartsWith('f') == true)
+                    //    .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
+                    //    .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
+
+                    var mas_f = vertices.Where(x => x.StartsWith('f') == true);
+
+                    foreach (string str in mas_f)
+                    {
+                        string pre = str.Remove(0, 1);
+                        string[] buf = pre.Trim().Split(new char[] { '/', ' ' });
+                        int[] res = new int[buf.Length];
+                        for (int i = 0; i < buf.Length; i++)
+                        {
+                            if (buf[i] == "")
+                            {
+                                res[i] = 0;
+                            }
+                            else
+                            {
+                                res[i] = int.Parse(buf[i]);
+                            }
+                        }
+                        listF.Add(res);
+                    }
                 }
             }
             catch (IOException e)

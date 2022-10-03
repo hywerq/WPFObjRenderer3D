@@ -28,7 +28,7 @@ namespace AKG
                 TransformMatrix.width = (float)img.ActualWidth;
                 TransformMatrix.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\Groda.obj");
+                Model.ReadFile("..\\..\\..\\objects\\Sting-Sword-lowpoly.obj");
 
                 VectorTransformation.UpdateViewPort();
 

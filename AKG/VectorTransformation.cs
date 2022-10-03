@@ -40,15 +40,17 @@ namespace AKG
 
         public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, float mov_x, float mov_y, float mov_Z)
         {
+            Model.model.Clear();
+
             //for (int i = 0; i < Model.listV.Count; i++)
             //{
-            //    Model.listV[i] = Vector3.Transform(Model.originalV[i], TransformMatrix.RotateMatrixX);
-            //    Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.RotateMatrixY);
-            //    Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.RotateMatrixZ);
+            //    Model.model.Add(Vector4.Transform(Model.listV[i], TransformMatrix.RotateMatrixX));
+            //    Model.model[i] = Vector4.Transform(Model.model[i], TransformMatrix.RotateMatrixY);
+            //    Model.model[i] = Vector4.Transform(Model.model[i], TransformMatrix.RotateMatrixZ);
 
-            //    Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.ScaleMatrix);
+            //    Model.model[i] = Vector4.Transform(Model.model[i], TransformMatrix.ScaleMatrix);
 
-            //    Model.listV[i] = Vector3.Transform(Model.listV[i], TransformMatrix.MoveMatrix);
+            //    Model.model[i] = Vector4.Transform(Model.model[i], TransformMatrix.MoveMatrix);
             //}
 
             //Matrix4x4 mx_Model = Matrix4x4.Multiply(
@@ -65,7 +67,12 @@ namespace AKG
             //Matrix4x4 Projection_View_Scale_Rotation_Z = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Y, TransformMatrix.RotateMatrixZ);
             //Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View_Scale_Rotation_Z, TransformMatrix.MoveMatrix);
 
-            Model.model.Clear();
+            //Matrix4x4 Projection_View = Matrix4x4.Multiply(TransformMatrix.AnglePerspectiveProjection, TransformMatrix.View);
+            //Matrix4x4 Projection_View_Move = Matrix4x4.Multiply(Projection_View, TransformMatrix.MoveMatrix);
+            //Matrix4x4 Projection_View_Move_Rotation_X = Matrix4x4.Multiply(Projection_View_Move, TransformMatrix.RotateMatrixX);
+            //Matrix4x4 Projection_View_Move_Rotation_Y = Matrix4x4.Multiply(Projection_View_Move_Rotation_X, TransformMatrix.RotateMatrixY);
+            //Matrix4x4 Projection_View_Move_Rotation_Z = Matrix4x4.Multiply(Projection_View_Move_Rotation_Y, TransformMatrix.RotateMatrixZ);
+            //Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View_Move_Rotation_Z, TransformMatrix.ScaleMatrix); 
 
             var View = Matrix4x4.CreateLookAt(TransformMatrix.eye, TransformMatrix.target, TransformMatrix.up);
             var Projection = Matrix4x4.CreatePerspectiveFieldOfView(TransformMatrix.fov, TransformMatrix.aspect, TransformMatrix.near, TransformMatrix.far);
@@ -73,13 +80,6 @@ namespace AKG
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
             var Translation = Matrix4x4.CreateTranslation(new Vector3(mov_x, mov_y, mov_Z));
-
-            //Matrix4x4 Projection_View = Matrix4x4.Multiply(TransformMatrix.AnglePerspectiveProjection, TransformMatrix.View);
-            //Matrix4x4 Projection_View_Move = Matrix4x4.Multiply(Projection_View, TransformMatrix.MoveMatrix);
-            //Matrix4x4 Projection_View_Move_Rotation_X = Matrix4x4.Multiply(Projection_View_Move, TransformMatrix.RotateMatrixX);
-            //Matrix4x4 Projection_View_Move_Rotation_Y = Matrix4x4.Multiply(Projection_View_Move_Rotation_X, TransformMatrix.RotateMatrixY);
-            //Matrix4x4 Projection_View_Move_Rotation_Z = Matrix4x4.Multiply(Projection_View_Move_Rotation_Y, TransformMatrix.RotateMatrixZ);
-            //Matrix4x4 Projection_View_Model = Matrix4x4.Multiply(Projection_View_Move_Rotation_Z, TransformMatrix.ScaleMatrix);
 
             Matrix4x4 Projection_View_Model = Scale * Rotation * Translation * View * Projection;
 

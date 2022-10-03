@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AKG"
         mc:Ignorable="d"
-        Name="window" Title="MainWindow" WindowState="Maximized" Height="1080" Width="1920" KeyDown="window_KeyDown">
+        Name="window" Title="MainWindow" WindowState="Maximized" Height="1080" Width="1920" KeyDown="window_KeyDown" SizeChanged="window_SizeChanged">
     <Grid>
         <Grid.Background>
             <RadialGradientBrush>
@@ -18,6 +18,10 @@
 
         </Canvas>
 
+        <Image Name="img">
+
+        </Image>
+
         <Label Content="X Angle:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbRotateX" Content="0" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Foreground="White"/>
 
@@ -27,8 +31,8 @@
         <Label Content="Z Angle:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbRotateZ" Content="0" HorizontalAlignment="Left" Margin="68,36,0,0" VerticalAlignment="Top" Foreground="White"/>
 
-        <Label Content="Zoom level:" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <Label Name="lbZoom" Content="1" HorizontalAlignment="Left" Margin="81,54,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="Scale level:" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbscale" Content="1" HorizontalAlignment="Left" Margin="81,54,0,0" VerticalAlignment="Top" Foreground="White"/>
 
         <Label Content="World position:" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbPos" Content="0, 0, 0" HorizontalAlignment="Left" Margin="101,113,0,0" VerticalAlignment="Top" Foreground="White"/>

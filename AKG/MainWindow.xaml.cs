@@ -144,39 +144,6 @@ namespace AKG
             }
         }
 
-        public void DrawModel()
-        {
-            WriteableBitmap bitmap = BitmapFactory.New((int)TransformMatrix.width, (int)TransformMatrix.height);
-            img.Source = bitmap;
-
-            foreach (var vector in Model.listF)
-            {
-                if (vector.Length > 3)
-                {
-                    int i;
-                    for (i = 0; i < vector.Length / 3; i += 3)
-                    {
-                        DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[i + 3] - 1]);
-                    }
-                    DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
-                }
-                else
-                {
-                    DrawVector(bitmap, Model.model[vector[0] - 1], Model.model[vector[1] - 1]);
-                    DrawVector(bitmap, Model.model[vector[1] - 1], Model.model[vector[2] - 1]);
-                    DrawVector(bitmap, Model.model[vector[2] - 1], Model.model[vector[0] - 1]);
-                }
-            }
-        }
-
-        private void DrawVector(WriteableBitmap bitmap, Vector4 v1, Vector4 v2)
-        {
-            using (bitmap.GetBitmapContext())
-            {
-                bitmap.DrawLine(Convert.ToInt32(v1.X), Convert.ToInt32(v1.Y), Convert.ToInt32(v2.X), Convert.ToInt32(v2.Y), Colors.White);
-            }
-        }
-
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             TransformMatrix.width = (float)img.ActualWidth;
@@ -187,53 +154,63 @@ namespace AKG
             DrawModel();
         }
 
+        public void DrawModel()
+        {
+            if (TransformMatrix.width == 0)
+            {
+                TransformMatrix.width = 1;
+            }
+            if (TransformMatrix.height == 0)
+            {
+                TransformMatrix.height = 1;
+            }
 
-        // Fastest, but doesn't work properly
-        //public void DrawModel()
-        //{
-        //    WriteableBitmap bitmap = new((int)TransformMatrix.width, (int)TransformMatrix.height, 96, 96, PixelFormats.Bgra32, null);
-        //    bitmap.Lock();
+            WriteableBitmap bitmap = new((int)TransformMatrix.width, (int)TransformMatrix.height, 96, 96, PixelFormats.Bgra32, null);
+            bitmap.Lock();
 
-        //    foreach (var vector in Model.listF)
-        //    {
-        //        int i;
-        //        for (i = 0; i < vector.Length / 3; i += 3)
-        //        {
-        //            DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[i + 3] - 1]);
-        //        }
-        //        DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
-        //    }
+            foreach (var vector in Model.listF)
+            {
+                int i;
+                for (i = 0; i < vector.Length / 3; i += 3)
+                {
+                    DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[i + 3] - 1]);
+                }
+                DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
+            }
 
-        //    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-        //    bitmap.Unlock();
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            bitmap.Unlock();
 
-        //    img.Source = bitmap;
-        //}
+            img.Source = bitmap;
+        }
 
-        //public void DrawVector(WriteableBitmap bitmap, Vector4 v1, Vector4 v2)
-        //{
-        //    float x = v1.X;
-        //    float y = v1.Y;
+        public void DrawVector(WriteableBitmap bitmap, Vector4 v1, Vector4 v2)
+        {
+            float x = v1.X;
+            float y = v1.Y;
 
-        //    float L = Math.Abs(v1.X - v2.X) > Math.Abs(v1.Y - v2.Y) ? Math.Abs(v1.X - v2.X) : Math.Abs(v1.Y - v2.Y);
+            float L = Math.Abs(v1.X - v2.X) > Math.Abs(v1.Y - v2.Y) ? Math.Abs(v1.X - v2.X) : Math.Abs(v1.Y - v2.Y);
 
-        //    for (int i = 0; i < L; i++)
-        //    {
-        //        x += (v1.X - v2.X) / L;
-        //        y += (v1.Y - v2.Y) / L;
-        //        DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)));
-        //    }
-        //}
+            for (int i = 0; i < L; i++)
+            {
+                x += (v2.X - v1.X) / L;
+                y += (v2.Y - v1.Y) / L;
+                DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)));
+            }
+        }
 
-        //private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y)
-        //{
-        //    byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y)
+        {
+            if (x > 0 && y > 0 && x < TransformMatrix.width && y < TransformMatrix.height)
+            {
+                byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
-        //    temp[0] = 255;
-        //    temp[1] = 255;
-        //    temp[2] = 255;
-        //    temp[3] = 255;
-        //}
+                temp[0] = 255;
+                temp[1] = 255;
+                temp[2] = 255;
+                temp[3] = 255;
+            }
+        }
 
 
         // Drawing on canvas, very slow

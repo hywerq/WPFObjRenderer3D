@@ -18,7 +18,7 @@
 
         </Canvas>
 
-        <Image Name="img">
+        <Image Name="img" Height="{Binding SystemParameters.PrimaryScreenHeight}"  Width="{Binding SystemParameters.PrimaryScreenWidth}"  Stretch="Fill" StretchDirection="Both">
 
         </Image>
 

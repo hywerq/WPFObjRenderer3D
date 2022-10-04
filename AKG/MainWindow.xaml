@@ -36,6 +36,8 @@
 
         <Label Content="World position:" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbPos" Content="0, 0, 0" HorizontalAlignment="Left" Margin="101,113,0,0" VerticalAlignment="Top" Foreground="White"/>
+        
+        <Label Content="W, A, S, D, E, Q - for moving. I, J, K, L, U, O - for rotating. T, G - for scaling." HorizontalAlignment="Left" Margin="1513,5,0,0" VerticalAlignment="Top" Foreground="White"/>
 
         <Label Content="Width:" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="60,74,700,331" Foreground="White"></Label>

@@ -12,12 +12,67 @@ namespace AKG
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static double angleX = -1;
-        private static double angleY = 0;
-        private static double angleZ = 0;
-        private static double scale = 0.000001;
-        private static double scale_level = 0.000001;
-        private static float[] movment = { 0, 0, 0 };
+        public static double angleX
+        {
+            get { return _angleX; }
+            set
+            {
+                if (value != _angleX)
+                {
+                    _angleX = value;
+                }
+            }
+        }
+        public static double angleY
+        {
+            get { return _angleY; }
+            set
+            {
+                if (value != _angleY)
+                {
+                    _angleY = value;
+                }
+            }
+        }
+        public static double angleZ
+        {
+            get { return _angleZ; }
+            set
+            {
+                if (value != _angleZ)
+                {
+                    _angleZ = value;
+                }
+            }
+        }
+        public static double scale
+        {
+            get { return _scale; }
+            set
+            {
+                if (value != _scale)
+                {
+                    _scale = value;
+                }
+            }
+        }
+        public static float[] movement
+        {
+            get { return _movement; }
+            set
+            {
+                if (value != _movement)
+                {
+                    _movement = value;
+                }
+            }
+        }
+
+        private static double _angleX = -1;
+        private static double _angleY = 0;
+        private static double _angleZ = 0;
+        private static double _scale = 0.00001;
+        private static float[] _movement = { 0, 0, 0 };
 
         public MainWindow()
         {
@@ -25,15 +80,15 @@ namespace AKG
 
             Loaded += delegate
             {
-                TransformMatrix.width = (float)img.ActualWidth;
-                TransformMatrix.height = (float)img.ActualHeight;
+                VectorTransformation.width = (float)img.ActualWidth;
+                VectorTransformation.height = (float)img.ActualHeight;
 
                 Model.ReadFile("..\\..\\..\\objects\\hollow.obj");
 
                 VectorTransformation.UpdateViewPort();
 
                 VectorTransformation.UpdateCameraBasicVectors();
-                VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
 
                 DrawModel();
             };
@@ -47,98 +102,98 @@ namespace AKG
                     angleX += 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.K:
                     angleX -= 0.1;
                     lbRotateX.Content = angleX.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.J:
                     angleY += 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.L:
                     angleY -= 0.1;
                     lbRotateY.Content = angleY.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.U:
                     angleZ += 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.O:
                     angleZ -= 0.1;
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.T:
-                    scale += scale_level;
+                    scale += scale;
                     lbscale.Content = scale.ToString("#.##########");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.G:
-                    scale -= scale_level;
+                    scale -= scale;
                     lbscale.Content = scale.ToString("#.##########");
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.D:
-                    movment[0] += 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[0] += 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.A:
-                    movment[0] -= 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[0] -= 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.S:
-                    movment[1] -= 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[1] -= 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.W:
-                    movment[1] += 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[1] += 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.E:
-                    movment[2] += 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[2] += 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.Q:
-                    movment[2] -= 1;
-                    lbPos.Content = movment[0].ToString() + ", " + movment[1].ToString() + ", " + movment[2].ToString();
+                    movement[2] -= 1;
+                    lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
             }
@@ -146,26 +201,26 @@ namespace AKG
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            TransformMatrix.width = (float)img.ActualWidth;
-            TransformMatrix.height = (float)img.ActualHeight;
+            VectorTransformation.width = (float)img.ActualWidth;
+            VectorTransformation.height = (float)img.ActualHeight;
 
             VectorTransformation.UpdateViewPort();
-            VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movment[0], movment[1], movment[2]);
+            VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
             DrawModel();
         }
 
         public void DrawModel()
         {
-            if (TransformMatrix.width == 0)
+            if (VectorTransformation.width == 0)
             {
-                TransformMatrix.width = 1;
+                VectorTransformation.width = 1;
             }
-            if (TransformMatrix.height == 0)
+            if (VectorTransformation.height == 0)
             {
-                TransformMatrix.height = 1;
+                VectorTransformation.height = 1;
             }
 
-            WriteableBitmap bitmap = new((int)TransformMatrix.width, (int)TransformMatrix.height, 96, 96, PixelFormats.Bgra32, null);
+            WriteableBitmap bitmap = new((int)VectorTransformation.width, (int)VectorTransformation.height, 96, 96, PixelFormats.Bgra32, null);
             bitmap.Lock();
 
             foreach (var vector in Model.listF)
@@ -201,7 +256,7 @@ namespace AKG
 
         private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y)
         {
-            if (x > 0 && y > 0 && x < TransformMatrix.width && y < TransformMatrix.height)
+            if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
@@ -211,82 +266,5 @@ namespace AKG
                 temp[3] = 255;
             }
         }
-
-
-        // Drawing on canvas, very slow
-        //private static void DrawLine(Canvas canvas, Vector3 v1, Vector3 v2)
-        //{
-        //    float x1 = v1.X;
-        //    float y1 = v1.Y;
-
-        //    float x2 = v2.X;
-        //    float y2 = v2.Y;
-
-        //    int x_start = Convert.ToInt32(Math.Round(x1));
-        //    int y_start = Convert.ToInt32(Math.Round(y1));
-
-        //    int x_end = Convert.ToInt32(Math.Round(x2));
-        //    int y_end = Convert.ToInt32(Math.Round(y2));
-
-        //    int L = (x_end - x_start) > (y_end - y_start) ? (x_end - x_start + 1) : (y_end - y_start + 1);
-
-        //    float x = x1;
-        //    float y = y1;
-        //    for (int i = 0; i < L; i++)
-        //    {
-        //        x += (x_end - x_start) / L;
-        //        y += (y_end - y_start) / L;
-
-        //        Line line = new Line();
-        //        line.X1 = Convert.ToInt32(Math.Round(x));
-        //        line.Y1 = Convert.ToInt32(Math.Round(y));
-        //        line.X2 = Convert.ToInt32(Math.Round(x));
-        //        line.Y2 = Convert.ToInt32(Math.Round(y));
-        //        line.Stroke = Brushes.Beige;
-        //        line.StrokeThickness = 1;
-
-        //        canvas.Children.Add(line);
-        //    }
-        //}
-
-
-        // Working, but slow
-        //public void DrawModel()
-        //{
-        //    canvas.Children.Clear();
-
-        //    foreach (var vector in Model.listF)
-        //    {
-        //        canvas.Children.Add(DrawLine(Model.model[vector[0] - 1], Model.model[vector[3] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[3] - 1], Model.model[vector[6] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[6] - 1], Model.model[vector[9] - 1]));
-        //        canvas.Children.Add(DrawLine(Model.model[vector[9] - 1], Model.model[vector[0] - 1]));
-        //    }
-        //}
-
-        //private Line DrawLine(Vector4 v1, Vector4 v2)
-        //{
-        //    Line line = new Line();
-
-        //    line.Stroke = Brushes.Beige;
-        //    line.StrokeThickness = 1;
-
-        //    line.X1 = v1.X * scale + GetWindowCenterWidth();
-        //    line.Y1 = v1.Y * scale + GetWindowCenterHeight();
-        //    line.X2 = v2.X * scale + GetWindowCenterWidth();
-        //    line.Y2 = v2.Y * scale + GetWindowCenterHeight();
-
-        //    return line;
-        //}
-
-        //private float GetWindowCenterWidth()
-        //{
-        //    return TransformMatrix.width / 2;
-        //}
-
-        //private float GetWindowCenterHeight()
-        //{
-        //    return TransformMatrix.height / 2;
-        //}
     }
 }

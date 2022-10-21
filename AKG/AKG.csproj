@@ -5,6 +5,19 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="objects\hollow.obj" />
+    <None Remove="objects\hollowknight.obj" />
+    <None Remove="objects\sword.obj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="objects\hollow.obj" />
+    <Content Include="objects\hollowknight.obj" />
+    <Content Include="objects\sword.obj" />
+  </ItemGroup>
 
 </Project>

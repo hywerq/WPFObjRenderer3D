@@ -11,10 +11,10 @@ namespace AKG
     static class Model
     {
         public static List<Vector3> listV = new List<Vector3>();
-        public static List<Vector3> originalV = new List<Vector3>();
         public static List<int[]> listF = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector3> listVt = new List<Vector3>();
+        public static List<Vector4> model = new();
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 
@@ -34,7 +34,6 @@ namespace AKG
                         .Where(x => x[0] == "v")
                         .Select(x => x.Skip(1).ToArray())
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
-                    originalV = new List<Vector3>(listV);
                     /*
                     listVn = temp
                         .Where(x => x[0] == "vn")
@@ -47,10 +46,32 @@ namespace AKG
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList(); 
                     */
 
-                    listF = vertices
-                        .Where(x => x.StartsWith('f') == true)
-                        .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
-                        .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
+                    // Depricated?
+                    //listF = vertices
+                    //    .Where(x => x.StartsWith('f') == true)
+                    //    .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
+                    //    .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
+
+                    var mas_f = vertices.Where(x => x.StartsWith('f') == true);
+
+                    foreach (string str in mas_f)
+                    {
+                        string pre = str.Remove(0, 1);
+                        string[] buf = pre.Trim().Split(new char[] { '/', ' ' });
+                        int[] res = new int[buf.Length];
+                        for (int i = 0; i < buf.Length; i++)
+                        {
+                            if (buf[i] == "")
+                            {
+                                res[i] = 0;
+                            }
+                            else
+                            {
+                                res[i] = int.Parse(buf[i]);
+                            }
+                        }
+                        listF.Add(res);
+                    }
                 }
             }
             catch (IOException e)

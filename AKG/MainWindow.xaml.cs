@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
@@ -68,11 +70,11 @@ namespace AKG
             }
         }
 
-        private static double _angleX = -1;
-        private static double _angleY = 0;
+        private static double _angleX = -0.1;
+        private static double _angleY = 2.5;
         private static double _angleZ = 0;
         private static double _scale = 0.00001;
-        private static float[] _movement = { 0, 0, 0 };
+        private static float[] _movement = { 0, -11, 0 };
 
         public MainWindow()
         {
@@ -141,14 +143,14 @@ namespace AKG
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.T:
-                    scale += scale;
+                    scale += 0.00001;
                     lbscale.Content = scale.ToString("#.##########");
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     DrawModel();
                     break;
                 case System.Windows.Input.Key.G:
-                    scale -= scale;
+                    scale -= 0.00001;
                     lbscale.Content = scale.ToString("#.##########");
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
@@ -233,6 +235,8 @@ namespace AKG
                 DrawVector(bitmap, Model.model[vector[i] - 1], Model.model[vector[0] - 1]);
             }
 
+            Rasterization(bitmap);
+
             bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             bitmap.Unlock();
 
@@ -265,6 +269,94 @@ namespace AKG
                 temp[2] = 255;
                 temp[3] = 255;
             }
+        }
+
+        private void Rasterization(WriteableBitmap bitmap)
+        {
+            int ch = 0;
+            foreach (var vector in Model.listF)
+            {
+                List<Vector4> points = new List<Vector4>();
+                for (int i = 0; i < vector.Length / 3; i += 3)
+                {
+                    points.Add(Model.model[vector[i] - 1]);
+                    points.Add(Model.model[vector[i + 3] - 1]);
+                }
+
+                List<Vector4> uniq = new List<Vector4>();
+
+                foreach (var val in points)
+                {
+                    if (!uniq.Any(c => c.X == val.X && c.Y == val.Y))
+                    {
+                        uniq.Add(val);
+                    }
+                }
+
+                int minX = int.MaxValue;
+                int minY = int.MinValue;
+                int maxX = int.MinValue;
+                int maxY = int.MaxValue;
+
+                foreach (var val in uniq)
+                {
+                    minX = val.X < minX ? Convert.ToInt32(Math.Abs(val.X)) : minX;
+                    maxX = val.X > maxX ? Convert.ToInt32(Math.Abs(val.X)) : maxX;
+                    minY = val.Y < maxY ? Convert.ToInt32(Math.Abs(val.Y)) : minY;
+                    maxY = val.Y > maxY ? Convert.ToInt32(Math.Abs(val.Y)) : maxY;
+                }
+
+                //Vector4[] start = { new Vector4(minX, minY, 0, 0), new Vector4(maxX, minY, 0, 0) };
+                //Vector4[] end = { new Vector4(minX, maxY, 0, 0), new Vector4(maxX, maxY, 0, 0) };
+
+                for (; minY < maxY; minY++)
+                {
+                    Vector4 scanlineStart = new Vector4(minX, minY, 0, 0);
+                    Vector4 scanlineEnd = new Vector4(maxX, minY, 0, 0);
+
+                    List<Vector4> line = new List<Vector4>();
+                    int i;
+                    for (i = 0; i < uniq.Count - 2; i++)
+                    {
+                        Vector4 point = Intersection(scanlineStart, scanlineEnd, uniq[i], uniq[i + 1]);
+                        if (point.X != 0 && point.Y != 0 && point.Z != 0)
+                        {
+                            line.Add(point);
+                        }
+                    }
+                    Vector4 pointer = Intersection(scanlineStart, scanlineEnd, uniq[i], uniq[0]);
+                    if (pointer.X != 0 && pointer.Y != 0 && pointer.Z != 0)
+                    {
+                        line.Add(pointer);
+                    }
+
+                    if (line.Count > 2)
+                    {
+                        throw new Exception("a");
+                    }
+
+                    DrawVector(bitmap, line[0], line[1]);
+                }
+                Console.WriteLine(ch++.ToString());
+            }
+        }
+
+        static public Vector4 Intersection(Vector4 A, Vector4 B, Vector4 C, Vector4 D)
+        {
+            double xo = A.X, yo = A.Y, zo = A.Z;
+            double p = B.X - A.X, q = B.Y - A.Y, r = B.Z - A.Z;
+
+            double x1 = C.X, y1 = C.Y, z1 = C.Z;
+            double p1 = D.X - C.X, q1 = D.Y - C.Y, r1 = D.Z - C.Z;
+
+            double x = (xo * q * p1 - x1 * q1 * p - yo * p * p1 + y1 * p * p1) /
+                (q * p1 - q1 * p);
+            double y = (yo * p * q1 - y1 * p1 * q - xo * q * q1 + x1 * q * q1) /
+                (p * q1 - p1 * q);
+            double z = (zo * q * r1 - z1 * q1 * r - yo * r * r1 + y1 * r * r1) /
+                (q * r1 - q1 * r);
+
+            return new Vector4((float)x, (float)y, (float)z, 0);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Windows.Media.Media3D;
+using System.Threading.Tasks;
 
 namespace AKG
 {
@@ -53,7 +52,7 @@ namespace AKG
 
         public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, float mov_x, float mov_y, float mov_Z)
         {
-            Model.model.Clear();
+            Model.model = new Vector4[Model.listV.Count];
 
             var View = Matrix4x4.CreateLookAt(eye, target, up);
             var Projection = Matrix4x4.CreatePerspectiveFieldOfView(fov, aspect, near, far);
@@ -64,15 +63,14 @@ namespace AKG
 
             Matrix4x4 Projection_View_Model = Scale * Rotation * Translation * View * Projection;
 
-
-            for (int i = 0; i < Model.listV.Count; i++)
-            {
-                Model.model.Add(Vector4.Transform(Model.listV[i], Projection_View_Model));
-
-                Model.model[i] /= Model.model[i].W;
-
-                Model.model[i] = Vector4.Transform(Model.model[i], Viewport);
-            }
+            Parallel.For(0, Model.listV.Count,
+                   (i) =>
+                   {
+                       Model.model[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
+                       Model.model[i] /= Model.model[i].W;
+                       Model.model[i] = Vector4.Transform(Model.model[i], Viewport);
+                   }
+                );
         }
     }
 }

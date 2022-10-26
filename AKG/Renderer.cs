@@ -50,56 +50,73 @@ namespace AKG
                 x += (v2.X - v1.X) / L;
                 y += (v2.Y - v1.Y) / L;
 
-                DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)));
+                DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)), Vector3.One);
             }
         }
 
-        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y)
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
-                temp[0] = 255;
-                temp[1] = 255;
-                temp[2] = 255;
+                temp[0] = (byte)Math.Min(color.X * 255, 255);
+                temp[1] = (byte)Math.Min(color.Y * 255, 255);
+                temp[2] = (byte)Math.Min(color.Z * 255, 255);
                 temp[3] = 255;
             }
         }
 
+        // TODO PixelWidth
+
         private void Rasterization(WriteableBitmap bitmap)
         {
+            float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
+
             foreach (var vector in Model.listF)
             {
                 for (int j = 3; j < vector.Length - 3; j += 3)
                 {
                     Vector4[] triangle = { Model.model[vector[0] - 1], Model.model[vector[j] - 1], Model.model[vector[j + 3] - 1] };
 
+                    Vector4 edge1 = triangle[1] - triangle[0];
+                    Vector4 edge2 = triangle[2] - triangle[0];
+                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+                    {
+                        continue;
+                    }                    
+
                     Array.Sort(triangle, (x, y) => x.Y.CompareTo(y.Y));
 
-                    Vector4 koeff1 = ((triangle[1] - triangle[0]) / (triangle[1].Y - triangle[0].Y));
-                    Vector4 koeff2 = ((triangle[2] - triangle[0]) / (triangle[2].Y - triangle[0].Y));
-                    Vector4 koeff3 = ((triangle[2] - triangle[1]) / (triangle[2].Y - triangle[1].Y));
+                    Vector4 koeff_01 = ((triangle[1] - triangle[0]) / (triangle[1].Y - triangle[0].Y));
+                    Vector4 koeff_02 = ((triangle[2] - triangle[0]) / (triangle[2].Y - triangle[0].Y));
+                    Vector4 koeff_12 = ((triangle[2] - triangle[1]) / (triangle[2].Y - triangle[1].Y));
 
-                    int minY = (int)MathF.Ceiling(triangle[0].Y);
-                    int maxY = (int)MathF.Ceiling(triangle[2].Y);
+                    int minY = Math.Max((int)MathF.Ceiling(triangle[0].Y), 0);
+                    int maxY = Math.Min((int)MathF.Ceiling(triangle[2].Y), bitmap.PixelHeight - 1);
 
                     for (int y = minY; y < maxY; y++)
                     {
-                        Vector4 a = y > triangle[1].Y ? triangle[1] + (y - triangle[1].Y) * koeff3 : triangle[0] + (y - triangle[0].Y) * koeff1;
-                        Vector4 b = triangle[0] + (y - triangle[0].Y) * koeff2;
+                        Vector4 a = y > triangle[1].Y ? triangle[1] + (y - triangle[1].Y) * koeff_12 : triangle[0] + (y - triangle[0].Y) * koeff_01;
+                        Vector4 b = triangle[0] + (y - triangle[0].Y) * koeff_02;
 
                         if (a.X > b.X)
                         {
                             (a, b) = (b, a);
                         }
 
-                        int minX = (int)MathF.Ceiling(a.X);
-                        int maxX = (int)MathF.Ceiling(b.X);
+                        int minX = Math.Max((int)MathF.Ceiling(a.X), 0);
+                        int maxX = Math.Min((int)MathF.Ceiling(b.X), bitmap.PixelWidth - 1);
 
+                        Vector4 koeff_ab = (b - a) / (b.X - a.X);
                         for (int x = minX; x < maxX; x++)
                         {
-                            DrawPixel(bitmap, x, y);
+                            Vector4 p = a + (x - a.X) * koeff_ab;
+                            if (z_buff[y, x] == null || z_buff[y, x] > p.Z)
+                            {
+                                z_buff[y, x] = p.Z;
+                                DrawPixel(bitmap, x, y, new(p.Z));
+                            }
                         }
                     }
                 }

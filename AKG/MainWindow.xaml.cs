@@ -72,7 +72,7 @@ namespace AKG
         private static double _angleX = 0;
         private static double _angleY = 0;
         private static double _angleZ = 0;
-        private static double _scale = 0.3;
+        private static double _scale = 0.000001;
         private static float[] _movement = { 0, 0, 0 };
 
         public MainWindow()
@@ -86,7 +86,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\wolf.obj");
+                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
 
                 VectorTransformation.UpdateViewPort();
 
@@ -144,14 +144,14 @@ namespace AKG
                     renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.T:
-                    scale += 0.00001;
+                    scale += 0.000001;
                     lbscale.Content = scale.ToString("#.##########");
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.G:
-                    scale -= 0.00001;
+                    scale -= 0.000001;
                     lbscale.Content = scale.ToString("#.##########");
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);

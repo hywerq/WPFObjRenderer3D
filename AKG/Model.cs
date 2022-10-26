@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Documents;
 
 namespace AKG
 {
@@ -49,27 +47,46 @@ namespace AKG
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList(); 
                     */
 
-                    listF = vertices
-                        .Where(x => x.StartsWith('f') == true)
-                        .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
-                        .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
+                    //listF = vertices
+                    //    .Where(x => x.StartsWith('f') == true)
+                    //    .Select(x => x.Remove(0, 2).TrimEnd().Split('/', ' ')).ToArray()
+                    //    .Select(x => Array.ConvertAll(x, int.Parse)).ToList();
 
-/*                    var mas_f = vertices.Where(x => x.StartsWith('f') == true);
+                    var mas_f = vertices.Where(x => x.StartsWith('f') == true);
 
                     foreach (string str in mas_f)
                     {
                         string pre = str.Remove(0, 1);
                         string[] buf = pre.Trim().Split(new char[] { '/', ' ' });
-                        int[] res = new int[buf.Length];
-                        for (int i = 0; i < buf.Length; i++)
+                        int len = buf.Length;
+                        if (buf.Length == 3)
                         {
-                            if (buf[i] == "")
+                            len *= 3;
+                        }
+                        int[] res = new int[len];
+                        for (int i = 0; i < len; i++)
+                        {
+                            if (buf.Length == len)
                             {
-                                res[i] = 0;
+                                if (buf[i] == "")
+                                {
+                                    res[i] = 0;
+                                }
+                                else
+                                {
+                                    res[i] = int.Parse(buf[i]);
+                                }
                             }
                             else
                             {
-                                res[i] = int.Parse(buf[i]);
+                                if (i % 3 == 0)
+                                {
+                                    res[i] = int.Parse(buf[i / 3]);
+                                }
+                                else
+                                {
+                                    res[i] = 0;
+                                }
                             }
                         }
 
@@ -77,7 +94,7 @@ namespace AKG
                     }
 
                     var inListButNotInList2 = listF.Except(listF2).ToList();
-                    var inList2ButNotInList = listF2.Except(listF).ToList();*/
+                    var inList2ButNotInList = listF2.Except(listF).ToList();
                 }
             }
             catch (IOException e)

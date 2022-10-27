@@ -12,9 +12,8 @@ namespace AKG
     public partial class MainWindow : Window
     {
         private static Renderer renderer;
-        private SerialPort serialPort;
 
-        public static double angleX
+        public double angleX
         {
             get { return _angleX; }
             set
@@ -22,7 +21,10 @@ namespace AKG
                 if (value != _angleX)
                 {
                     _angleX = value;
-                    
+                    lbRotateX.Content = angleX.ToString("#.##");
+
+                    VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, _movement[0], _movement[1], _movement[2]);
+                    renderer.DrawModel();
                 }
             }
         }
@@ -35,11 +37,15 @@ namespace AKG
                 if (value != _angleY)
                 {
                     _angleY = value;
+                    lbRotateY.Content = angleY.ToString("#.##");
+
+                    VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, _movement[0], _movement[1], _movement[2]);
+                    renderer.DrawModel();
                 }
             }
         }
 
-        public static double angleZ
+        public double angleZ
         {
             get { return _angleZ; }
             set
@@ -47,11 +53,15 @@ namespace AKG
                 if (value != _angleZ)
                 {
                     _angleZ = value;
+                    lbRotateZ.Content = angleZ.ToString("#.##");
+
+                    VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, _movement[0], _movement[1], _movement[2]); 
+                    renderer.DrawModel();
                 }
             }
         }
 
-        public static double scale
+        public double scale
         {
             get { return _scale; }
             set
@@ -59,11 +69,15 @@ namespace AKG
                 if (value != _scale)
                 {
                     _scale = value;
+                    lbscale.Content = scale.ToString("#.##########");
+
+                    VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, _movement[0], _movement[1], _movement[2]);
+                    renderer.DrawModel();
                 }
             }
         }
 
-        public static float[] movement
+        public float[] movement
         {
             get { return _movement; }
             set
@@ -75,11 +89,11 @@ namespace AKG
             }
         }
 
-        private static double _angleX = 0;
-        private static double _angleY = 0;
-        private static double _angleZ = 0;
-        private static double _scale = 10;
-        private static float[] _movement = { 0, 0, 0 };
+        private double _angleX = 0;
+        private double _angleY = 0;
+        private double _angleZ = 0;
+        private double _scale = 10;
+        private float[] _movement = { 0, 0, 0 };
 
         public MainWindow()
         {
@@ -115,21 +129,32 @@ namespace AKG
 
             serialPort.Open();
 
+            bool flagInit = true;
+            double serialPortAngle = 0;
+
             while (serialPort.IsOpen)
             {
-                try
-                {
-                    double temp = serialPort.ReadByte();
+                serialPortAngle  = (((255 - serialPort.ReadByte()) * 360) >> 8) / 60;
 
+                if(flagInit)
+                {
                     Dispatcher.Invoke(DispatcherPriority.Normal, () =>
                     {
-                        _angleY = temp / 10;
-                        VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                        renderer.DrawModel();
+                        angleY = serialPortAngle;
                     });
+
+                    flagInit = false;
                 }
-                catch (TimeoutException) { }
+
+                Dispatcher.Invoke(DispatcherPriority.Normal, () =>
+                {
+                    angleY += serialPortAngle > angleY + 0.1 ? 0.1
+                    : serialPortAngle < angleY - 0.1 ? -0.1
+                    : 0;
+                });
             }
+
+            serialPort.Close();
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -138,59 +163,27 @@ namespace AKG
             {
                 case System.Windows.Input.Key.I:
                     angleX += 0.1;
-                    lbRotateX.Content = angleX.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.K:
                     angleX -= 0.1;
-                    lbRotateX.Content = angleX.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.J:
                     angleY += 0.1;
-                    lbRotateY.Content = angleY.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.L:
                     angleY -= 0.1;
-                    lbRotateY.Content = angleY.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.U:
                     angleZ += 0.1;
-                    lbRotateZ.Content = angleZ.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.O:
                     angleZ -= 0.1;
-                    lbRotateZ.Content = angleZ.ToString("#.##");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.T:
-                    scale += 0.000001;
-                    lbscale.Content = scale.ToString("#.##########");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
+                    scale += 0.1;
                     break;
                 case System.Windows.Input.Key.G:
-                    scale -= 0.000001;
-                    lbscale.Content = scale.ToString("#.##########");
-
-                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
-                    renderer.DrawModel();
+                    scale -= 0.1;
                     break;
                 case System.Windows.Input.Key.D:
                     movement[0] += 1;

@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO.Ports;
+using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace AKG
 {
@@ -7,7 +11,8 @@ namespace AKG
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Renderer renderer;
+        private static Renderer renderer;
+        private SerialPort serialPort;
 
         public static double angleX
         {
@@ -17,11 +22,12 @@ namespace AKG
                 if (value != _angleX)
                 {
                     _angleX = value;
+                    
                 }
             }
         }
 
-        public static double angleY
+        public double angleY
         {
             get { return _angleY; }
             set
@@ -72,7 +78,7 @@ namespace AKG
         private static double _angleX = 0;
         private static double _angleY = 0;
         private static double _angleZ = 0;
-        private static double _scale = 0.000001;
+        private static double _scale = 10;
         private static float[] _movement = { 0, 0, 0 };
 
         public MainWindow()
@@ -86,7 +92,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
+                Model.ReadFile("..\\..\\..\\objects\\hollow.obj");
 
                 VectorTransformation.UpdateViewPort();
 
@@ -95,6 +101,35 @@ namespace AKG
 
                 renderer.DrawModel();
             };
+
+            Thread readThread = new Thread(ReadSerialPortData);
+            readThread.Start();
+        }
+
+        void ReadSerialPortData()
+        {
+            SerialPort serialPort = new SerialPort("COM7", 115200, Parity.None, 8, StopBits.One)
+            {
+                ReadTimeout = 500
+            };
+
+            serialPort.Open();
+
+            while (serialPort.IsOpen)
+            {
+                try
+                {
+                    double temp = serialPort.ReadByte();
+
+                    Dispatcher.Invoke(DispatcherPriority.Normal, () =>
+                    {
+                        _angleY = temp / 10;
+                        VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                        renderer.DrawModel();
+                    });
+                }
+                catch (TimeoutException) { }
+            }
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

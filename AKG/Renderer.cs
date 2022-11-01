@@ -79,13 +79,19 @@ namespace AKG
                 {
                     Vector4[] triangle = { Model.model[vector[0] - 1], Model.model[vector[j] - 1], Model.model[vector[j + 3] - 1] };
 
+                    // Отбраковка невидимых поверхностей.
                     Vector4 edge1 = triangle[1] - triangle[0];
                     Vector4 edge2 = triangle[2] - triangle[0];
                     if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
                     {
                         continue;
-                    }                    
+                    }
 
+                    // Модель освещения Ламберта.
+                    Vector3 normalizer = new((edge1.Y * edge2.Z - edge1.Z * edge2.Y), (edge1.Z * edge2.X - edge1.X * edge2.Z), (edge1.X * edge2.Y - edge1.Y * edge2.X));
+                    float color = normalizer.X * VectorTransformation.light.X + normalizer.Y * VectorTransformation.light.Y + normalizer.Y * VectorTransformation.light.Y;
+
+                    // Растеризация.
                     Array.Sort(triangle, (x, y) => x.Y.CompareTo(y.Y));
 
                     Vector4 koeff_01 = ((triangle[1] - triangle[0]) / (triangle[1].Y - triangle[0].Y));
@@ -112,10 +118,11 @@ namespace AKG
                         for (int x = minX; x < maxX; x++)
                         {
                             Vector4 p = a + (x - a.X) * koeff_ab;
+                            // Z-буффер.
                             if (z_buff[y, x] == null || z_buff[y, x] > p.Z)
                             {
                                 z_buff[y, x] = p.Z;
-                                DrawPixel(bitmap, x, y, new(p.Z));
+                                DrawPixel(bitmap, x, y, new(color));
                             }
                         }
                     }

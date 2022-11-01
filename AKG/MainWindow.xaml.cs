@@ -86,7 +86,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
+                Model.ReadFile("..\\..\\..\\objects\\sword.obj");
 
                 VectorTransformation.UpdateViewPort();
 

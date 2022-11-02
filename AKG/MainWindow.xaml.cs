@@ -74,6 +74,7 @@ namespace AKG
         private static double _angleZ = 0;
         private static double _scale = 0.000001;
         private static float[] _movement = { 0, 0, 0 };
+        private static float[] _camera_movement = { 0, 0, 100 };
 
         public MainWindow()
         {
@@ -86,7 +87,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\sword.obj");
+                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
 
                 VectorTransformation.UpdateViewPort();
 
@@ -171,30 +172,72 @@ namespace AKG
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();
                     break;
-                case System.Windows.Input.Key.S:
+                case System.Windows.Input.Key.Q:
                     movement[1] -= 1;
                     lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();
                     break;
-                case System.Windows.Input.Key.W:
+                case System.Windows.Input.Key.E:
                     movement[1] += 1;
                     lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();
                     break;
-                case System.Windows.Input.Key.E:
+                case System.Windows.Input.Key.W:
                     movement[2] += 1;
                     lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();
                     break;
-                case System.Windows.Input.Key.Q:
+                case System.Windows.Input.Key.S:
                     movement[2] -= 1;
                     lbPos.Content = movement[0].ToString() + ", " + movement[1].ToString() + ", " + movement[2].ToString();
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad6:
+                    _camera_movement[0] += 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad4:
+                    _camera_movement[0] -= 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad7:
+                    _camera_movement[1] -= 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad9:
+                    _camera_movement[1] += 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad8:
+                    _camera_movement[2] += 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
+
+                    VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
+                    renderer.DrawModel();
+                    break;
+                case System.Windows.Input.Key.NumPad5:
+                    _camera_movement[2] -= 1;
+                    VectorTransformation.eye = new(_camera_movement[0], _camera_movement[1], _camera_movement[2]);
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement[0], movement[1], movement[2]);
                     renderer.DrawModel();

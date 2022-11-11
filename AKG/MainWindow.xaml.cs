@@ -78,7 +78,7 @@ namespace AKG
         private static double _angleZ = 0;
         private static double _scale = 0.000001;
         private static float[] movement = { 0, 0, 0 };
-        private static float[] camera_movement = { 0, 0, 100 };
+        private static float[] camera_movement = { VectorTransformation.eye.X, VectorTransformation.eye.Y, VectorTransformation.eye.Z };
 
         public MainWindow()
         {
@@ -91,7 +91,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\Model.obj");
+                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
 
                 VectorTransformation.UpdateViewPort();
 

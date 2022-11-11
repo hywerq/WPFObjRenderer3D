@@ -14,7 +14,7 @@ namespace AKG
         public static Vector3 target = new Vector3(0.0f, 0.0f, 0.0f);
         public static Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 
-        public static Vector3 light = new Vector3(0.0f, 5.0f, 0.0f);
+        public static Vector3 light = new Vector3(0.0f, 5.0f, 100.0f);
 
         public static float width = 1;
         public static float height = 1;
@@ -54,23 +54,27 @@ namespace AKG
 
         public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, float mov_x, float mov_y, float mov_Z)
         {
-            Model.model = new Vector4[Model.listV.Count];
-
-            var View = Matrix4x4.CreateLookAt(eye, target, up);
-            var Projection = Matrix4x4.CreatePerspectiveFieldOfView(fov, aspect, near, far);
+            Model.screenVertices = new Vector4[Model.listV.Count];
+            Model.worldVertices = new Vector4[Model.listV.Count];
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
             var Translation = Matrix4x4.CreateTranslation(new Vector3(mov_x, mov_y, mov_Z));
 
-            Matrix4x4 Projection_View_Model = Scale * Rotation * Translation * View * Projection;
+            Matrix4x4 World = Scale * Rotation * Translation;
+
+            var View = Matrix4x4.CreateLookAt(eye, target, up);
+            var Projection = Matrix4x4.CreatePerspectiveFieldOfView(fov, aspect, near, far);
+
+            Matrix4x4 Projection_View_Model = World * View * Projection;
 
             Parallel.For(0, Model.listV.Count,
                    (i) =>
                    {
-                       Model.model[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
-                       Model.model[i] /= Model.model[i].W;
-                       Model.model[i] = Vector4.Transform(Model.model[i], Viewport);
+                       Model.worldVertices[i] = Vector4.Transform(Model.listV[i], World);
+                       Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
+                       Model.screenVertices[i] /= Model.screenVertices[i].W;
+                       Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
                    }
                 );
         }

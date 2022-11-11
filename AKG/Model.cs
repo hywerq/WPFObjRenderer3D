@@ -15,7 +15,8 @@ namespace AKG
         public static List<int[]> listF2 = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector3> listVt = new List<Vector3>();
-        public static Vector4[] model;
+        public static Vector4[] screenVertices;
+        public static Vector4[] worldVertices;
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 

@@ -84,7 +84,7 @@ namespace AKG
                     // Отбраковка невидимых поверхностей.
                     Vector4 edge1 = screenTriangle[1] - screenTriangle[0];
                     Vector4 edge2 = screenTriangle[2] - screenTriangle[0];
-                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+                    if (edge1.X * edge2.Y - edge1.Y * edge2.X > 0)
                     {
                         continue;
                     }
@@ -100,28 +100,28 @@ namespace AKG
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
                     {
                         (screenTriangle[0], screenTriangle[1]) = (screenTriangle[1], screenTriangle[0]);
-                        (worldTriangle[0], worldTriangle[1]) = (worldTriangle[1], worldTriangle[0]);
+                        (worldTriangle[0],  worldTriangle[1])  = (worldTriangle[1],  worldTriangle[0]);
                     }
                     if (screenTriangle[0].Y > screenTriangle[2].Y)
                     {
                         (screenTriangle[0], screenTriangle[2]) = (screenTriangle[2], screenTriangle[0]);
-                        (worldTriangle[0], worldTriangle[2]) = (worldTriangle[2], worldTriangle[0]);
+                        (worldTriangle[0],  worldTriangle[2])  = (worldTriangle[2],  worldTriangle[0]);
                     }
                     if (screenTriangle[1].Y > screenTriangle[2].Y)
                     {
                         (screenTriangle[1], screenTriangle[2]) = (screenTriangle[2], screenTriangle[1]);
-                        (worldTriangle[1], worldTriangle[2]) = (worldTriangle[2], worldTriangle[1]);
+                        (worldTriangle[1],  worldTriangle[2])  = (worldTriangle[2],  worldTriangle[1]);
                     }
 
 
                     Vector4 screenKoeff01 = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector4 worldKoeff01 =  (worldTriangle[1] - worldTriangle[0])   / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector4 worldKoeff01 =  (worldTriangle[1]  - worldTriangle[0])  / (screenTriangle[1].Y - screenTriangle[0].Y);
 
                     Vector4 screenKoeff02 = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector4 worldKoeff02 =  (worldTriangle[2] - worldTriangle[0])   / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector4 worldKoeff02 =  (worldTriangle[2]  - worldTriangle[0])  / (screenTriangle[2].Y - screenTriangle[0].Y);
 
                     Vector4 screenKoeff03 = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector4 worldKoeff03 =  (worldTriangle[2] - worldTriangle[1])   / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector4 worldKoeff03 =  (worldTriangle[2]  - worldTriangle[1])  / (screenTriangle[2].Y - screenTriangle[1].Y);
 
                     int minY = Math.Max((int)MathF.Ceiling(screenTriangle[0].Y), 0);
                     int maxY = Math.Min((int)MathF.Ceiling(screenTriangle[2].Y), bitmap.PixelHeight - 1);
@@ -132,9 +132,9 @@ namespace AKG
                                                                     screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff01;
                         Vector4 screenB = screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff02;
 
-                        Vector4 worldA = y > worldTriangle[1].Y ? worldTriangle[1] + (y - screenTriangle[1].Y) * worldKoeff03 : 
-                                                                  worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff01;
-                        Vector4 worldB = worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff02;
+                        Vector4 worldA = y > worldTriangle[1].Y   ? worldTriangle[1] + (y - screenTriangle[1].Y) * worldKoeff03 : 
+                                                                    worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff01;
+                        Vector4 worldB = worldTriangle[0]   + (y - screenTriangle[0].Y) * worldKoeff02;
 
                         if (screenA.X > screenB.X)
                         {
@@ -150,12 +150,14 @@ namespace AKG
                         for (int x = minX; x < maxX; x++)
                         {
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
-                            Vector4 pWorld = worldA + (x - screenA.X) * worldKoeff;
+                            Vector4 pWorld  = worldA  + (x - screenA.X) * worldKoeff;
+                            pScreen = Vector4.Normalize(pScreen);
+                            pWorld = Vector4.Normalize(pWorld);
 
                             // Z-буффер.
-                            if (z_buff[y, x] == null || z_buff[y, x] > pWorld.Z)
+                            if (z_buff[y, x] == null || z_buff[y, x] > pScreen.Z)
                             {
-                                z_buff[y, x] = pWorld.Z;
+                                z_buff[y, x] = pScreen.Z;
                                 Vector3 lightDir = new(VectorTransformation.light.X - pWorld.X, VectorTransformation.light.Y - pWorld.Y, VectorTransformation.light.Z - pWorld.Z);
                                 lightDir = Vector3.Normalize(lightDir);
                                 float color = Vector3.Dot(normal, lightDir);

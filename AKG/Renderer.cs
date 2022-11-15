@@ -31,7 +31,10 @@ namespace AKG
             WriteableBitmap bitmap = new((int)VectorTransformation.width, (int)VectorTransformation.height, 96, 96, PixelFormats.Bgra32, null);
             bitmap.Lock();
 
-            Rasterization(bitmap);
+
+            Random rand = new Random();
+            var tint = new int[] { rand.Next(0, 255), rand.Next(0, 255), rand.Next(0, 255) };
+            Rasterization(bitmap, tint);
 
             bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             bitmap.Unlock();
@@ -39,38 +42,20 @@ namespace AKG
             image.Source = bitmap;
         }
 
-        private void DrawVector(WriteableBitmap bitmap, Vector4 v1, Vector4 v2)
-        {
-            float x = v1.X;
-            float y = v1.Y;
-
-            float L = Math.Abs(v1.X - v2.X) > Math.Abs(v1.Y - v2.Y) ? Math.Abs(v1.X - v2.X) : Math.Abs(v1.Y - v2.Y);
-
-            for (int i = 0; i < L; i++)
-            {
-                x += (v2.X - v1.X) / L;
-                y += (v2.Y - v1.Y) / L;
-
-                DrawPixel(bitmap, Convert.ToInt32(Math.Round(x)), Convert.ToInt32(Math.Round(y)), Vector3.One);
-            }
-        }
-
-        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color)
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color, int[] tint)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
-                temp[0] = (byte)Math.Min(color.X * 255, 255);
-                temp[1] = (byte)Math.Min(color.Y * 255, 255);
-                temp[2] = (byte)Math.Min(color.Z * 255, 255);
+                temp[0] = (byte)Math.Min(color.X * tint[0], 255);
+                temp[1] = (byte)Math.Min(color.Y * tint[1], 255);
+                temp[2] = (byte)Math.Min(color.Z * tint[2], 255);
                 temp[3] = 255;
             }
         }
 
-        // TODO PixelWidth
-
-        private void Rasterization(WriteableBitmap bitmap)
+        private void Rasterization(WriteableBitmap bitmap, int[] tint)
         {
             float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
 
@@ -82,20 +67,26 @@ namespace AKG
                     Vector4[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
                     // Отбраковка невидимых поверхностей.
-                    Vector4 edge1 = screenTriangle[1] - screenTriangle[0];
-                    Vector4 edge2 = screenTriangle[2] - screenTriangle[0];
-                    if (edge1.X * edge2.Y - edge1.Y * edge2.X > 0)
-                    {
-                        continue;
-                    }
+                    //Vector4 edge1 = screenTriangle[1] - screenTriangle[0];
+                    //Vector4 edge2 = screenTriangle[2] - screenTriangle[0];
+                    //if (edge1.X * edge2.Y - edge1.Y * edge2.X > 0)
+                    //{
+                    //    continue;
+                    //}
 
-                    edge1 = worldTriangle[1] - worldTriangle[0];
-                    edge2 = worldTriangle[2] - worldTriangle[0];
+                    Vector4 edge1 = worldTriangle[1] - worldTriangle[0];
+                    Vector4 edge2 = worldTriangle[2] - worldTriangle[0];
 
                     // Модель освещения Ламберта.
                     Vector3 normal = new((edge1.Y * edge2.Z - edge1.Z * edge2.Y), (edge1.Z * edge2.X - edge1.X * edge2.Z), (edge1.X * edge2.Y - edge1.Y * edge2.X));
                     normal = Vector3.Normalize(normal);
-                    
+
+                    // Отбраковка невидимых поверхностей.
+                    if (Vector3.Dot(normal, VectorTransformation.eye) < 0)
+                    {
+                        continue;
+                    }
+
                     // Растеризация.
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
                     {
@@ -161,7 +152,7 @@ namespace AKG
                                 Vector3 lightDir = new(VectorTransformation.light.X - pWorld.X, VectorTransformation.light.Y - pWorld.Y, VectorTransformation.light.Z - pWorld.Z);
                                 lightDir = Vector3.Normalize(lightDir);
                                 float color = Vector3.Dot(normal, lightDir);
-                                DrawPixel(bitmap, x, y, new(color));
+                                DrawPixel(bitmap, x, y, new(color), tint);
                             }
                         }
                     }

@@ -9,6 +9,14 @@ namespace AKG
     {
         private static Renderer renderer;
 
+        private static double _angleX = 0;
+        private static double _angleY = 0;
+        private static double _angleZ = 0;
+        private static double _scale = 3;
+        private static double _scaleDiff = 0.1; //0.000001;
+        private static float[] movement = { 0, 0, 0 };
+        private static float[] camera_movement = { VectorTransformation.eye.X, VectorTransformation.eye.Y, VectorTransformation.eye.Z };
+
         public double angleX
         {
             get { return _angleX; }
@@ -73,13 +81,6 @@ namespace AKG
             }
         }
 
-        private static double _angleX = 0;
-        private static double _angleY = 0;
-        private static double _angleZ = 0;
-        private static double _scale = 0.000001;
-        private static float[] movement = { 0, 0, 0 };
-        private static float[] camera_movement = { VectorTransformation.eye.X, VectorTransformation.eye.Y, VectorTransformation.eye.Z };
-
         public MainWindow()
         {
             InitializeComponent();
@@ -91,7 +92,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\shovel_low.obj");
+                Model.ReadFile("..\\..\\..\\objects\\pekka.obj");
 
                 VectorTransformation.UpdateViewPort();
 
@@ -125,10 +126,10 @@ namespace AKG
                     angleZ -= 0.1;
                     break;
                 case System.Windows.Input.Key.T:
-                    scale += 0.000001;
+                    scale += _scaleDiff;
                     break;
                 case System.Windows.Input.Key.G:
-                    scale -= 0.000001;
+                    scale -= _scaleDiff;
                     break;
                 case System.Windows.Input.Key.D:
                     movement[0] += 1;

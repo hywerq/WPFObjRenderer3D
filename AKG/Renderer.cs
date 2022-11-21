@@ -22,7 +22,7 @@ namespace AKG
         private float diffuseFactor = 0.5f;
         private float specularFactor = 0.5f;
 
-        private float glossFactor = 1f;
+        private float glossFactor = 0.1f;
 
         private Vector3 objectColor = new(0.3f, 0.7f, 0.23f);
         private Vector3 lightColor = new(100f, 100f, 0f);
@@ -60,10 +60,11 @@ namespace AKG
             return values;
         }
 
-        private int[] SpecularLightning()
+        private int[] SpecularLightning(Vector3 View)
         {
             Vector3 reflection = Vector3.Reflect(lightDirection, normal);
-            float RV = Vector3.Dot(reflection, new Vector3(1f, 0, 0));
+            reflection = Vector3.Normalize(reflection);
+            float RV = Vector3.Dot(reflection, View);
 
             if (RV < 0)
             {
@@ -80,28 +81,16 @@ namespace AKG
             return values;
         }
 
-        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color)
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, int[] ambientValues, int[] diffuseValues, int[] specularValues)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
-
-                //2
-                temp[0] = (byte)Math.Min(color.Z * 255, 255);
-                temp[1] = (byte)Math.Min(color.Y * 255, 255);
-                temp[2] = (byte)Math.Min(color.X * 255, 255);
                 temp[3] = 255;
-
-                //3
-                //int[] ambientValues = AmbientLightning();
-                //int[] diffuseValues = DiffuseLightning(color);
-                //int[] specularValues = SpecularLightning();
-
-                //temp[3] = 255;
-                //temp[2] = (byte)Math.Min(ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
-                //temp[1] = (byte)Math.Min(ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
-                //temp[0] = (byte)Math.Min(ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
+                temp[2] = (byte)Math.Min(ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
+                temp[1] = (byte)Math.Min(ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
+                temp[0] = (byte)Math.Min(ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
             }
         }
 
@@ -118,10 +107,6 @@ namespace AKG
 
             WriteableBitmap bitmap = new((int)VectorTransformation.width, (int)VectorTransformation.height, 96, 96, PixelFormats.Bgra32, null);
             bitmap.Lock();
-
-            //2
-            //Random rand = new Random();
-            //var tint = new int[] { rand.Next(0, 255), rand.Next(0, 255), rand.Next(0, 255) };
 
             Rasterization(bitmap);
 
@@ -156,13 +141,6 @@ namespace AKG
                     // Модель освещения Ламберта.
                     normal = Vector3.Cross(worldEdge1, worldEdge2);
                     normal = Vector3.Normalize(normal);
-
-                    // Отбраковка невидимых поверхностей.
-                    //Vector3 buf = new(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z);
-                    //if (Vector3.Dot(normal, VectorTransformation.eye - buf) < 0)
-                    //{
-                    //    continue;
-                    //}
 
                     // Растеризация.
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -220,9 +198,6 @@ namespace AKG
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
                             Vector3 pWorld = worldA + (x - screenA.X) * worldKoeff;
 
-                            //pScreen = Vector4.Normalize(pScreen);
-                            //pWorld = Vector3.Normalize(pWorld);
-
                             // Z-буффер.
                             if (!(pScreen.Z > z_buff[y, x]))
                             {
@@ -232,7 +207,12 @@ namespace AKG
                                 lightDirection = Vector3.Normalize(lightDirection);
                                 var attenuation = 1 / Math.Max(distance, 0.01f);
                                 float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
-                                DrawPixel(bitmap, x, y, intensity * objectColor * attenuation * lightColor);
+
+                                int[] ambientValues = AmbientLightning();
+                                int[] diffuseValues = DiffuseLightning(intensity * objectColor * attenuation * lightColor);
+                                int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye);
+
+                                DrawPixel(bitmap, x, y, ambientValues, diffuseValues, specularValues);
                             }
                         }
                     }

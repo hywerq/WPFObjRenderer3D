@@ -92,7 +92,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\Model.obj");
+                Model.ReadFile("..\\..\\..\\objects\\pekka.obj");
 
                 VectorTransformation.UpdateViewPort();
 

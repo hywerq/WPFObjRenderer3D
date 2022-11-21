@@ -14,17 +14,17 @@ namespace AKG
 
         private Vector3 normal, lightDirection;
 
-        private float[] ambientColor = new float[] { 9, 56, 97 };
-        private float[] diffuseColor = new float[] { 87, 171, 105 };
-        private float[] specularColor = new float[] { 212, 21, 21 };
+        private float[] ambientColor = new float[] { 6, 11, 31 }; //dark blue
+        private float[] diffuseColor = new float[] { 30, 82, 33 }; //green
+        private float[] specularColor = new float[] { 154, 121, 166 }; //greyish pink
 
-        private float ambientFactor = 1f;
-        private float diffuseFactor = 0.5f;
-        private float specularFactor = 0.5f;
+        private float ambientFactor = 1.5f;
+        private float diffuseFactor = 1.5f;
+        private float specularFactor = 0.4f;
 
-        private float glossFactor = 0.1f;
+        private float glossFactor = 0.3f;
 
-        private Vector3 objectColor = new(0.3f, 0.7f, 0.23f);
+        private Vector3 objectColor = new(255, 255, 255);
         private Vector3 lightColor = new(100f, 100f, 0f);
 
         public Renderer(Image image)
@@ -44,32 +44,21 @@ namespace AKG
             return values;
         }
 
-        private int[] DiffuseLightning(Vector3 color)
+        private int[] DiffuseLightning(float color)
         {
             int[] values = new int[3];
 
-            if(color.X < 0)
-            {
-                color = new(0);
-            }
-
-            values[0] = (int)(diffuseFactor * color.X * diffuseColor[0]);
-            values[1] = (int)(diffuseFactor * color.Y * diffuseColor[1]);
-            values[2] = (int)(diffuseFactor * color.Z * diffuseColor[2]);
+            values[0] = (int)(diffuseFactor * color * diffuseColor[0]);
+            values[1] = (int)(diffuseFactor * color * diffuseColor[1]);
+            values[2] = (int)(diffuseFactor * color * diffuseColor[2]);
             
             return values;
         }
 
         private int[] SpecularLightning(Vector3 View)
         {
-            Vector3 reflection = Vector3.Reflect(lightDirection, normal);
-            reflection = Vector3.Normalize(reflection);
-            float RV = Vector3.Dot(reflection, View);
-
-            if (RV < 0)
-            {
-                RV = 0;
-            }
+            Vector3 reflection = Vector3.Normalize(Vector3.Reflect(lightDirection, normal));
+            float RV = Math.Max(Vector3.Dot(reflection, View), 0);
 
             int[] values = new int[3];
             double temp = Math.Pow(RV, glossFactor);
@@ -209,7 +198,7 @@ namespace AKG
                                 float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
 
                                 int[] ambientValues = AmbientLightning();
-                                int[] diffuseValues = DiffuseLightning(intensity * objectColor * attenuation * lightColor);
+                                int[] diffuseValues = DiffuseLightning(intensity);
                                 int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye);
 
                                 DrawPixel(bitmap, x, y, ambientValues, diffuseValues, specularValues);

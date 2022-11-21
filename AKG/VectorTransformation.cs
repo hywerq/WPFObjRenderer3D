@@ -14,7 +14,7 @@ namespace AKG
         public static Vector3 target = new Vector3(0.0f, 0.0f, 0.0f);
         public static Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 
-        public static Vector3 light = new Vector3(10.0f, 10.0f, 20.0f);
+        public static Vector3 light = new Vector3(0f, 40f, 40f);
 
         public static float width = 1;
         public static float height = 1;

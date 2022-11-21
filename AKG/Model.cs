@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -16,7 +17,7 @@ namespace AKG
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector3> listVt = new List<Vector3>();
         public static Vector4[] screenVertices;
-        public static Vector4[] worldVertices;
+        public static Vector3[] worldVertices;
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 
@@ -29,13 +30,14 @@ namespace AKG
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
                     var temp = vertices
-                        .Select(x => Regex.Replace(x.TrimEnd().Replace('.', ','), @"\s+", " ").Split(' '))
+                        .Select(x => Regex.Replace(x.TrimEnd(), @"\s+", " ").Split(' '))
                         .Where(x => verticesTypes.Any(x[0].Contains)).ToArray();
 
                     listV = temp
                         .Where(x => x[0] == "v")
                         .Select(x => x.Skip(1).ToArray())
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
+
                     /*
                     listVn = temp
                         .Where(x => x[0] == "vn")
@@ -97,6 +99,23 @@ namespace AKG
                     var inListButNotInList2 = listF.Except(listF2).ToList();
                     var inList2ButNotInList = listF2.Except(listF).ToList();
                 }
+
+                //foreach (string line in File.ReadLines(path))
+                //{
+                //    string[] args = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                //    if (args.Length > 0)
+                //    {
+                //        switch (args[0])
+                //        {
+                //            case "v":
+                //                listV.Add(new Vector3(float.Parse(args[1], CultureInfo.InvariantCulture), float.Parse(args[2], CultureInfo.InvariantCulture), float.Parse(args[3], CultureInfo.InvariantCulture)));
+                //                break;
+                //            default:
+                //                break;
+                //        }
+
+                //    }
+                //}
             }
             catch (IOException e)
             {

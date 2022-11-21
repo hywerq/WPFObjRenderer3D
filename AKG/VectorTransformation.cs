@@ -10,11 +10,11 @@ namespace AKG
         public static Vector3 YAxis = new Vector3(1.0f, 1.0f, 1.0f);
         public static Vector3 ZAxis = new Vector3(1.0f, 1.0f, 1.0f);
 
-        public static Vector3 eye = new Vector3(0.0f, 0.0f, 100.0f);
+        public static Vector3 eye = new Vector3(0.0f, 0.0f, 40.0f);
         public static Vector3 target = new Vector3(0.0f, 0.0f, 0.0f);
         public static Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 
-        public static Vector3 light = new Vector3(0.0f, 5.0f, 100.0f);
+        public static Vector3 light = new Vector3(10.0f, 10.0f, 40.0f);
 
         public static float width = 1;
         public static float height = 1;
@@ -55,7 +55,7 @@ namespace AKG
         public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, float mov_x, float mov_y, float mov_Z)
         {
             Model.screenVertices = new Vector4[Model.listV.Count];
-            Model.worldVertices = new Vector4[Model.listV.Count];
+            Model.worldVertices = new Vector3[Model.listV.Count];
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
@@ -71,7 +71,7 @@ namespace AKG
             Parallel.For(0, Model.listV.Count,
                    (i) =>
                    {
-                       Model.worldVertices[i] = Vector4.Transform(Model.listV[i], World);
+                       Model.worldVertices[i] = Vector3.Transform(Model.listV[i], World);
                        Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
                        Model.screenVertices[i] /= Model.screenVertices[i].W;
                        Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);

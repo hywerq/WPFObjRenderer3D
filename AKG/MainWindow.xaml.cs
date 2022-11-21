@@ -12,8 +12,8 @@ namespace AKG
         private static double _angleX = 0;
         private static double _angleY = 0;
         private static double _angleZ = 0;
-        private static double _scale = 3;
-        private static double _scaleDiff = 0.1; //0.000001;
+        private static double _scale = 1;
+        private static double _scaleDiff = 1;
         private static float[] movement = { 0, 0, 0 };
         private static float[] camera_movement = { VectorTransformation.eye.X, VectorTransformation.eye.Y, VectorTransformation.eye.Z };
 
@@ -92,7 +92,7 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\pekka.obj");
+                Model.ReadFile("..\\..\\..\\objects\\Model.obj");
 
                 VectorTransformation.UpdateViewPort();
 

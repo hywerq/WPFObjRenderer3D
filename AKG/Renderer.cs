@@ -24,6 +24,9 @@ namespace AKG
 
         private float glossFactor = 1f;
 
+        private Vector3 objectColor = new(0.3f, 0.7f, 0.23f);
+        private Vector3 lightColor = new(100f, 100f, 0f);
+
         public Renderer(Image image)
         {
             this.image = image;
@@ -77,7 +80,7 @@ namespace AKG
             return values;
         }
 
-        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color, int[] tint)
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 color)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
@@ -85,20 +88,20 @@ namespace AKG
 
 
                 //2
-                /*temp[0] = (byte)Math.Min(color.X * tint[0], 255);
-                temp[1] = (byte)Math.Min(color.Y * tint[1], 255);
-                temp[2] = (byte)Math.Min(color.Z * tint[2], 255);
-                temp[3] = 255;*/
+                temp[0] = (byte)Math.Min(color.Z * 255, 255);
+                temp[1] = (byte)Math.Min(color.Y * 255, 255);
+                temp[2] = (byte)Math.Min(color.X * 255, 255);
+                temp[3] = 255;
 
                 //3
-                int[] ambientValues = AmbientLightning();
-                int[] diffuseValues = DiffuseLightning(color);
-                int[] specularValues = SpecularLightning();
+                //int[] ambientValues = AmbientLightning();
+                //int[] diffuseValues = DiffuseLightning(color);
+                //int[] specularValues = SpecularLightning();
 
-                temp[3] = 255;
-                temp[2] = (byte)Math.Min(ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
-                temp[1] = (byte)Math.Min(ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
-                temp[0] = (byte)Math.Min(ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
+                //temp[3] = 255;
+                //temp[2] = (byte)Math.Min(ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
+                //temp[1] = (byte)Math.Min(ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
+                //temp[0] = (byte)Math.Min(ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
             }
         }
 
@@ -120,7 +123,7 @@ namespace AKG
             //Random rand = new Random();
             //var tint = new int[] { rand.Next(0, 255), rand.Next(0, 255), rand.Next(0, 255) };
 
-            Rasterization(bitmap, new int[] { 255, 255, 255 });
+            Rasterization(bitmap);
 
             bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             bitmap.Unlock();
@@ -128,7 +131,7 @@ namespace AKG
             image.Source = bitmap;
         }
 
-        private void Rasterization(WriteableBitmap bitmap, int[] tint)
+        private void Rasterization(WriteableBitmap bitmap)
         {
             float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
 
@@ -137,28 +140,29 @@ namespace AKG
                 for (int j = 3; j < vector.Length - 3; j += 3)
                 {
                     Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
-                    Vector4[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
+                    Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
                     // Отбраковка невидимых поверхностей.
-                    //Vector4 edge1 = screenTriangle[1] - screenTriangle[0];
-                    //Vector4 edge2 = screenTriangle[2] - screenTriangle[0];
-                    //if (edge1.X * edge2.Y - edge1.Y * edge2.X > 0)
-                    //{
-                    //    continue;
-                    //}
-
-                    Vector4 edge1 = worldTriangle[1] - worldTriangle[0];
-                    Vector4 edge2 = worldTriangle[2] - worldTriangle[0];
-
-                    // Модель освещения Ламберта.
-                    normal = new((edge1.Y * edge2.Z - edge1.Z * edge2.Y), (edge1.Z * edge2.X - edge1.X * edge2.Z), (edge1.X * edge2.Y - edge1.Y * edge2.X));
-                    normal = Vector3.Normalize(normal);
-
-                    // Отбраковка невидимых поверхностей.
-                    if (Vector3.Dot(normal, VectorTransformation.eye) < 0)
+                    Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
+                    Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
+                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
                     {
                         continue;
                     }
+
+                    Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
+                    Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
+
+                    // Модель освещения Ламберта.
+                    normal = Vector3.Cross(worldEdge1, worldEdge2);
+                    normal = Vector3.Normalize(normal);
+
+                    // Отбраковка невидимых поверхностей.
+                    //Vector3 buf = new(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z);
+                    //if (Vector3.Dot(normal, VectorTransformation.eye - buf) < 0)
+                    //{
+                    //    continue;
+                    //}
 
                     // Растеризация.
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -179,26 +183,26 @@ namespace AKG
 
 
                     Vector4 screenKoeff01 = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector4 worldKoeff01 = (worldTriangle[1] - worldTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff01 = (worldTriangle[1] - worldTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
 
                     Vector4 screenKoeff02 = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector4 worldKoeff02 = (worldTriangle[2] - worldTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff02 = (worldTriangle[2] - worldTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
 
                     Vector4 screenKoeff03 = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector4 worldKoeff03 = (worldTriangle[2] - worldTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector3 worldKoeff03 = (worldTriangle[2] - worldTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
 
                     int minY = Math.Max((int)MathF.Ceiling(screenTriangle[0].Y), 0);
-                    int maxY = Math.Min((int)MathF.Ceiling(screenTriangle[2].Y), bitmap.PixelHeight - 1);
+                    int maxY = Math.Min((int)MathF.Ceiling(screenTriangle[2].Y), bitmap.PixelHeight);
 
                     for (int y = minY; y < maxY; y++)
                     {
-                        Vector4 screenA = y > screenTriangle[1].Y ? screenTriangle[1] + (y - screenTriangle[1].Y) * screenKoeff03 :
-                                                                    screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff01;
+                        Vector4 screenA = y < screenTriangle[1].Y ? screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff01 :
+                                                                    screenTriangle[1] + (y - screenTriangle[1].Y) * screenKoeff03; 
                         Vector4 screenB = screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff02;
 
-                        Vector4 worldA = y > worldTriangle[1].Y ? worldTriangle[1] + (y - screenTriangle[1].Y) * worldKoeff03 :
-                                                                    worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff01;
-                        Vector4 worldB = worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff02;
+                        Vector3 worldA = y < screenTriangle[1].Y ? worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff01 :
+                                                                   worldTriangle[1] + (y - screenTriangle[1].Y) * worldKoeff03;
+                        Vector3 worldB = worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff02;
 
                         if (screenA.X > screenB.X)
                         {
@@ -207,25 +211,28 @@ namespace AKG
                         }
 
                         int minX = Math.Max((int)MathF.Ceiling(screenA.X), 0);
-                        int maxX = Math.Min((int)MathF.Ceiling(screenB.X), bitmap.PixelWidth - 1);
+                        int maxX = Math.Min((int)MathF.Ceiling(screenB.X), bitmap.PixelWidth);
 
                         Vector4 screenKoeff = (screenB - screenA) / (screenB.X - screenA.X);
-                        Vector4 worldKoeff = (worldB - worldA) / (screenB.X - screenA.X);
+                        Vector3 worldKoeff = (worldB - worldA) / (screenB.X - screenA.X);
                         for (int x = minX; x < maxX; x++)
                         {
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
-                            Vector4 pWorld = worldA + (x - screenA.X) * worldKoeff;
-                            pScreen = Vector4.Normalize(pScreen);
-                            pWorld = Vector4.Normalize(pWorld);
+                            Vector3 pWorld = worldA + (x - screenA.X) * worldKoeff;
+
+                            //pScreen = Vector4.Normalize(pScreen);
+                            //pWorld = Vector3.Normalize(pWorld);
 
                             // Z-буффер.
-                            if (z_buff[y, x] == null || z_buff[y, x] > pScreen.Z)
+                            if (!(pScreen.Z > z_buff[y, x]))
                             {
                                 z_buff[y, x] = pScreen.Z;
-                                lightDirection = new(VectorTransformation.light.X - pWorld.X, VectorTransformation.light.Y - pWorld.Y, VectorTransformation.light.Z - pWorld.Z);
+                                lightDirection = VectorTransformation.light - pWorld;
+                                var distance = lightDirection.LengthSquared();
                                 lightDirection = Vector3.Normalize(lightDirection);
-                                float color = Vector3.Dot(normal, lightDirection);
-                                DrawPixel(bitmap, x, y, new(color), tint);
+                                var attenuation = 1 / Math.Max(distance, 0.01f);
+                                float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
+                                DrawPixel(bitmap, x, y, intensity * objectColor * attenuation * lightColor);
                             }
                         }
                     }

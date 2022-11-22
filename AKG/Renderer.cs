@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,9 @@ namespace AKG
 
         private Vector3 objectColor = new(255, 255, 255);
         private Vector3 lightColor = new(0.5f, 0.5f, 0f);
+
+        private Dictionary<Vector3, List<Vector3>> triangleNormals = new();
+        private Dictionary<Vector3, Vector3> vertexNormals = new();
 
         public Renderer(Image image)
         {
@@ -104,11 +109,68 @@ namespace AKG
             image.Source = bitmap;
         }
 
+        private void FindNormals()
+        {
+            triangleNormals.Clear();
+            vertexNormals.Clear();
+
+            foreach (int[] vector in Model.listF)
+            {
+                for (int j = 3; j < vector.Length - 3; j += 3)
+                {
+                    Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
+                    Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
+
+                    // Отбраковка невидимых поверхностей.
+                    Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
+                    Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
+
+                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+                    {
+                        continue;
+                    }
+
+                    Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
+                    Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
+
+                    // Модель освещения Ламберта.
+                    normal = Vector3.Cross(worldEdge1, worldEdge2);
+                    normal = Vector3.Normalize(normal);
+
+                    foreach (Vector3 vertex in worldTriangle)
+                    {
+                        if (triangleNormals.ContainsKey(vertex))
+                        {
+                            triangleNormals[vertex].Add(normal);
+                        }
+                        else
+                        {
+                            triangleNormals.Add(vertex, new List<Vector3>() { normal });
+                        }
+                    }
+                }
+            }
+
+            foreach(var item in triangleNormals)
+            {
+                Vector3 temp = Vector3.Zero;
+
+                for(int i = 0; i < item.Value.Count; i++)
+                {
+                    temp += item.Value[i];
+                }
+
+                vertexNormals.Add(item.Key, temp / item.Value.Count);
+            }
+        }
+
         private void Rasterization(WriteableBitmap bitmap)
         {
             float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
 
-            foreach (var vector in Model.listF)
+            FindNormals();
+
+            foreach (int[] vector in Model.listF)
             {
                 for (int j = 3; j < vector.Length - 3; j += 3)
                 {
@@ -147,6 +209,10 @@ namespace AKG
                         (worldTriangle[1], worldTriangle[2]) = (worldTriangle[2], worldTriangle[1]);
                     }
 
+                    //Поиск нормали вершины по ее значению.
+                    Vector3 vertexNormal0 = vertexNormals[new Vector3(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z)];
+                    Vector3 vertexNormal1 = vertexNormals[new Vector3(worldTriangle[1].X, worldTriangle[1].Y, worldTriangle[1].Z)];
+                    Vector3 vertexNormal2 = vertexNormals[new Vector3(worldTriangle[2].X, worldTriangle[2].Y, worldTriangle[2].Z)];
 
                     Vector4 screenKoeff01 = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
                     Vector3 worldKoeff01 = (worldTriangle[1] - worldTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
@@ -181,6 +247,7 @@ namespace AKG
 
                         Vector4 screenKoeff = (screenB - screenA) / (screenB.X - screenA.X);
                         Vector3 worldKoeff = (worldB - worldA) / (screenB.X - screenA.X);
+
                         for (int x = minX; x < maxX; x++)
                         {
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
@@ -190,10 +257,10 @@ namespace AKG
                             if (!(pScreen.Z > z_buff[y, x]))
                             {
                                 z_buff[y, x] = pScreen.Z;
-                                lightDirection = VectorTransformation.light - pWorld;
-                                var distance = lightDirection.LengthSquared();
-                                lightDirection = Vector3.Normalize(lightDirection);
-                                var attenuation = 1 / Math.Max(distance, 0.01f);
+                                lightDirection = Vector3.Normalize(VectorTransformation.light - pWorld);
+
+                                float distance = lightDirection.LengthSquared();
+                                float attenuation = 1 / Math.Max(distance, 0.01f);
                                 float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
 
                                 int[] ambientValues = AmbientLightning();

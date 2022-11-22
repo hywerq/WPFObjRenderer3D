@@ -28,6 +28,7 @@ namespace AKG
         public static float fov = MathF.PI / 4;
         public static float aspect = width / height;
 
+
         public static Matrix4x4 Viewport = new(
             (width / 2.0f), 0, 0, 0,
             0, (-height / 2.0f), 0, 0,
@@ -52,14 +53,14 @@ namespace AKG
             aspect = width / height;
         }
 
-        public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, float mov_x, float mov_y, float mov_Z)
+        public static void TransformVectors(float angleX, float angleY, float angleZ, float scale, Vector3 mov)
         {
             Model.screenVertices = new Vector4[Model.listV.Count];
             Model.worldVertices = new Vector3[Model.listV.Count];
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
-            var Translation = Matrix4x4.CreateTranslation(new Vector3(mov_x, mov_y, mov_Z));
+            var Translation = Matrix4x4.CreateTranslation(mov);
 
             Matrix4x4 World = Scale * Rotation * Translation;
 

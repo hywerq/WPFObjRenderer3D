@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,18 +13,18 @@ namespace AKG
 
         private Vector3 normal, lightDirection;
 
-        private float[] ambientColor = new float[] { 6, 11, 31 }; //dark blue
-        private float[] diffuseColor = new float[] { 30, 82, 33 }; //green
-        private float[] specularColor = new float[] { 154, 121, 166 }; //greyish pink
+        private float[] ambientColor = new float[] { 9, 56, 97 };
+        private float[] diffuseColor = new float[] { 87, 171, 105 };
+        private float[] specularColor = new float[] { 212, 21, 21 }; 
 
-        private float ambientFactor = 1.5f;
-        private float diffuseFactor = 1.5f;
-        private float specularFactor = 0.4f;
+        private float ambientFactor = 1.0f;
+        private float diffuseFactor = 1.0f;
+        private float specularFactor = 0.3f;
 
-        private float glossFactor = 0.3f;
+        private float glossFactor = 0.2f;
 
         private Vector3 objectColor = new(255, 255, 255);
-        private Vector3 lightColor = new(100f, 100f, 0f);
+        private Vector3 lightColor = new(0.5f, 0.5f, 0f);
 
         public Renderer(Image image)
         {

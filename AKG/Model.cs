@@ -30,7 +30,7 @@ namespace AKG
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
                     var temp = vertices
-                        .Select(x => Regex.Replace(x.TrimEnd().Replace('.', ','), @"\s+", " ").Split(' '))
+                        .Select(x => Regex.Replace(x.TrimEnd()/*.Replace('.', ',')*/, @"\s+", " ").Split(' '))
                         .Where(x => verticesTypes.Any(x[0].Contains)).ToArray();
 
                     listV = temp

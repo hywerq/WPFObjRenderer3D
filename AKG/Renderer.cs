@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,10 +19,10 @@ namespace AKG
         private float[] specularColor = new float[] { 212, 21, 21 }; 
 
         private float ambientFactor = 1.0f;
-        private float diffuseFactor = 1.0f;
+        private float diffuseFactor = 0.8f;
         private float specularFactor = 0.3f;
 
-        private float glossFactor = 0.2f;
+        private float glossFactor = 0.3f;
 
         private Vector3 objectColor = new(255, 255, 255);
         private Vector3 lightColor = new(0.5f, 0.5f, 0f);
@@ -48,13 +47,13 @@ namespace AKG
             return values;
         }
 
-        private int[] DiffuseLightning(float color)
+        private int[] DiffuseLightning(float intensity)
         {
             int[] values = new int[3];
 
-            values[0] = (int)(diffuseFactor * color * diffuseColor[0]);
-            values[1] = (int)(diffuseFactor * color * diffuseColor[1]);
-            values[2] = (int)(diffuseFactor * color * diffuseColor[2]);
+            values[0] = (int)(diffuseFactor * intensity * diffuseColor[0]);
+            values[1] = (int)(diffuseFactor * intensity * diffuseColor[1]);
+            values[2] = (int)(diffuseFactor * intensity * diffuseColor[2]);
             
             return values;
         }
@@ -121,14 +120,14 @@ namespace AKG
                     //Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
                     Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
-                    // Отбраковка невидимых поверхностей.
-                    //Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
-                    //Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
+                    //Отбраковка невидимых поверхностей.
+                    /*Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
+                    Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
 
-                    //if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
-                    //{
-                    //    continue;
-                    //}
+                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+                    {
+                        continue;
+                    }*/
 
                     Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
                     Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
@@ -185,13 +184,6 @@ namespace AKG
                     {
                         continue;
                     }
-
-                    //Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
-                    //Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
-
-                    //// Модель освещения Ламберта.
-                    //normal = Vector3.Cross(worldEdge1, worldEdge2);
-                    //normal = Vector3.Normalize(normal);
 
                     // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -293,7 +285,7 @@ namespace AKG
 
                                 // Освещение Фонга.
                                 int[] ambientValues = AmbientLightning();
-                                int[] diffuseValues = DiffuseLightning(intensity);
+                                int[] diffuseValues = DiffuseLightning(intensity * attenuation);
                                 int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye, lightDirection, normal);
 
                                 // Отрисовка.

@@ -13,7 +13,7 @@ namespace AKG
     {
         private Image image;
 
-        private Vector3 normal, lightDirection;
+        //private Vector3 normal, lightDirection;
 
         private float[] ambientColor = new float[] { 9, 56, 97 };
         private float[] diffuseColor = new float[] { 87, 171, 105 };
@@ -59,7 +59,7 @@ namespace AKG
             return values;
         }
 
-        private int[] SpecularLightning(Vector3 View)
+        private int[] SpecularLightning(Vector3 View, Vector3 lightDirection, Vector3 normal)
         {
             Vector3 reflection = Vector3.Normalize(Vector3.Reflect(lightDirection, normal));
             float RV = Math.Max(Vector3.Dot(reflection, View), 0);
@@ -118,23 +118,22 @@ namespace AKG
             {
                 for (int j = 3; j < vector.Length - 3; j += 3)
                 {
-                    Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
+                    //Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
                     Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
                     // Отбраковка невидимых поверхностей.
-                    Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
-                    Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
+                    //Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
+                    //Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
 
-                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
-                    {
-                        continue;
-                    }
+                    //if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+                    //{
+                    //    continue;
+                    //}
 
                     Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
                     Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
 
-                    // Модель освещения Ламберта.
-                    normal = Vector3.Cross(worldEdge1, worldEdge2);
+                    Vector3 normal = Vector3.Cross(worldEdge1, worldEdge2);
                     normal = Vector3.Normalize(normal);
 
                     foreach (Vector3 vertex in worldTriangle)
@@ -172,8 +171,10 @@ namespace AKG
 
             foreach (int[] vector in Model.listF)
             {
+                // Итерация по треугольникам в полигоне.
                 for (int j = 3; j < vector.Length - 3; j += 3)
                 {
+                    // Формирование треугольников в экранных и мировых координатах.
                     Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
                     Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
@@ -185,14 +186,14 @@ namespace AKG
                         continue;
                     }
 
-                    Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
-                    Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
+                    //Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
+                    //Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
 
-                    // Модель освещения Ламберта.
-                    normal = Vector3.Cross(worldEdge1, worldEdge2);
-                    normal = Vector3.Normalize(normal);
+                    //// Модель освещения Ламберта.
+                    //normal = Vector3.Cross(worldEdge1, worldEdge2);
+                    //normal = Vector3.Normalize(normal);
 
-                    // Растеризация.
+                    // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
                     {
                         (screenTriangle[0], screenTriangle[1]) = (screenTriangle[1], screenTriangle[0]);
@@ -209,25 +210,31 @@ namespace AKG
                         (worldTriangle[1], worldTriangle[2]) = (worldTriangle[2], worldTriangle[1]);
                     }
 
-                    //Поиск нормали вершины по ее значению.
+                    // Поиск нормали по вершинам.
                     Vector3 vertexNormal0 = vertexNormals[new Vector3(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z)];
                     Vector3 vertexNormal1 = vertexNormals[new Vector3(worldTriangle[1].X, worldTriangle[1].Y, worldTriangle[1].Z)];
                     Vector3 vertexNormal2 = vertexNormals[new Vector3(worldTriangle[2].X, worldTriangle[2].Y, worldTriangle[2].Z)];
 
-                    Vector4 screenKoeff01 = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector3 worldKoeff01 = (worldTriangle[1] - worldTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    // Нахождение коэффицентов в экранных и мировых координатах, коэффицента для нормалей.
+                    Vector4 screenKoeff01       = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff01        = (worldTriangle[1] - worldTriangle[0])   / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector3 vertexNormalKoeff01 = (vertexNormal1 - vertexNormal0)         / (screenTriangle[1].Y - screenTriangle[0].Y);
 
-                    Vector4 screenKoeff02 = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector3 worldKoeff02 = (worldTriangle[2] - worldTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector4 screenKoeff02       = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff02        = (worldTriangle[2] - worldTriangle[0])   / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector3 vertexNormalKoeff02 = (vertexNormal2 - vertexNormal0)         / (screenTriangle[2].Y - screenTriangle[0].Y);
 
-                    Vector4 screenKoeff03 = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector3 worldKoeff03 = (worldTriangle[2] - worldTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector4 screenKoeff03       = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector3 worldKoeff03        = (worldTriangle[2] - worldTriangle[1])   / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector3 vertexNormalKoeff03 = (vertexNormal2 - vertexNormal1)         / (screenTriangle[2].Y - screenTriangle[1].Y);
 
+                    // Нахождение минимального и максимального Y для треугольника на экране и последующей итерации.
                     int minY = Math.Max((int)MathF.Ceiling(screenTriangle[0].Y), 0);
                     int maxY = Math.Min((int)MathF.Ceiling(screenTriangle[2].Y), bitmap.PixelHeight);
 
                     for (int y = minY; y < maxY; y++)
                     {
+                        // Нахождение левого и правого значения Y.
                         Vector4 screenA = y < screenTriangle[1].Y ? screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff01 :
                                                                     screenTriangle[1] + (y - screenTriangle[1].Y) * screenKoeff03; 
                         Vector4 screenB = screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff02;
@@ -236,20 +243,32 @@ namespace AKG
                                                                    worldTriangle[1] + (y - screenTriangle[1].Y) * worldKoeff03;
                         Vector3 worldB = worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff02;
 
+                        // Нахождение нормали для левого и правого Y.
+                        Vector3 normalA = y < screenTriangle[1].Y ? vertexNormal0 + (y - screenTriangle[0].Y) * vertexNormalKoeff01 :
+                                                                    vertexNormal1 + (y - screenTriangle[1].Y) * vertexNormalKoeff03;
+                        Vector3 normalB = vertexNormal0 + (y - screenTriangle[0].Y) * vertexNormalKoeff02;
+
+                        // Сортировка значений в порядке "лево-право".
                         if (screenA.X > screenB.X)
                         {
                             (screenA, screenB) = (screenB, screenA);
-                            (worldA, worldB) = (worldB, worldA);
+                            (worldA , worldB)  = (worldB , worldA);
+                            (normalA, normalB) = (normalB, normalA);
                         }
 
+                        // Нахождение минимального и максимального X для треугольника на экране и последующей итерации.
                         int minX = Math.Max((int)MathF.Ceiling(screenA.X), 0);
                         int maxX = Math.Min((int)MathF.Ceiling(screenB.X), bitmap.PixelWidth);
 
+                        // Нахождение коэффицентов изменения X в экранных и мировых координатах, коэффицента изменения нормали.
                         Vector4 screenKoeff = (screenB - screenA) / (screenB.X - screenA.X);
-                        Vector3 worldKoeff = (worldB - worldA) / (screenB.X - screenA.X);
+                        Vector3 worldKoeff  = (worldB - worldA)   / (screenB.X - screenA.X);
+                        Vector3 normalKoeff = (normalB - normalA) / (screenB.X - screenA.X);
 
+                        // Сканирующая линия.
                         for (int x = minX; x < maxX; x++)
                         {
+                            // Нахождение координат точки в экранных и мировых координатах.
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
                             Vector3 pWorld = worldA + (x - screenA.X) * worldKoeff;
 
@@ -257,16 +276,27 @@ namespace AKG
                             if (!(pScreen.Z > z_buff[y, x]))
                             {
                                 z_buff[y, x] = pScreen.Z;
-                                lightDirection = Vector3.Normalize(VectorTransformation.light - pWorld);
 
+                                // Нахождение обратного вектора направления света.
+                                Vector3 lightDirection = Vector3.Normalize(VectorTransformation.light - pWorld);
+
+                                // Нахождение нормали для точки.
+                                Vector3 normal = normalA + (x - screenA.X) * normalKoeff;
+                                normal = Vector3.Normalize(normal);
+
+                                // Нахождение дистанции до источника света.
                                 float distance = lightDirection.LengthSquared();
+                                // Затенение объекта в зависимости от дистанции света до модели.
                                 float attenuation = 1 / Math.Max(distance, 0.01f);
+                                // Получение затененности каждой точки.
                                 float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
 
+                                // Освещение Фонга.
                                 int[] ambientValues = AmbientLightning();
                                 int[] diffuseValues = DiffuseLightning(intensity);
-                                int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye);
+                                int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye, lightDirection, normal);
 
+                                // Отрисовка.
                                 DrawPixel(bitmap, x, y, ambientValues, diffuseValues, specularValues);
                             }
                         }

@@ -14,9 +14,9 @@ namespace AKG
 
         //private Vector3 normal, lightDirection;
 
-        private float[] ambientColor = new float[] { 9, 56, 97 };
-        private float[] diffuseColor = new float[] { 87, 171, 105 };
-        private float[] specularColor = new float[] { 212, 21, 21 }; 
+        private Vector3 ambientColor = new Vector3 ( 9, 56, 97 );
+        private Vector3 diffuseColor = new Vector3 ( 87, 171, 105 );
+        private Vector3 specularColor = new Vector3 ( 212, 21, 21 ); 
 
         private float ambientFactor = 1.0f;
         private float diffuseFactor = 0.8f;
@@ -39,10 +39,9 @@ namespace AKG
         {
             int[] values = new int[3];
 
-            for (int i = 0; i < 3; i++)
-            {
-                values[i] = (int)(ambientColor[i] * ambientFactor);
-            }
+            values[0] = (int)(ambientColor.X * ambientFactor);
+            values[1] = (int)(ambientColor.Y * ambientFactor);
+            values[2] = (int)(ambientColor.Z * ambientFactor);            
 
             return values;
         }
@@ -51,9 +50,9 @@ namespace AKG
         {
             int[] values = new int[3];
 
-            values[0] = (int)(diffuseFactor * intensity * diffuseColor[0]);
-            values[1] = (int)(diffuseFactor * intensity * diffuseColor[1]);
-            values[2] = (int)(diffuseFactor * intensity * diffuseColor[2]);
+            values[0] = (int)(diffuseFactor * intensity * diffuseColor.X);
+            values[1] = (int)(diffuseFactor * intensity * diffuseColor.Y);
+            values[2] = (int)(diffuseFactor * intensity * diffuseColor.Z);
             
             return values;
         }
@@ -66,9 +65,9 @@ namespace AKG
             int[] values = new int[3];
             double temp = Math.Pow(RV, glossFactor);
 
-            values[0] = (int)(specularFactor * temp * specularColor[0]);
-            values[1] = (int)(specularFactor * temp * specularColor[1]);
-            values[2] = (int)(specularFactor * temp * specularColor[2]);
+            values[0] = (int)(specularFactor * temp * specularColor.X);
+            values[1] = (int)(specularFactor * temp * specularColor.Y);
+            values[2] = (int)(specularFactor * temp * specularColor.Z);
 
             return values;
         }

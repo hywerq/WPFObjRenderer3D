@@ -38,17 +38,15 @@ namespace AKG
                         .Select(x => x.Skip(1).ToArray())
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
 
-                    /*
                     listVn = temp
                         .Where(x => x[0] == "vn")
                         .Select(x => x.Skip(1).ToArray())
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
 
-                    listVt = temp
-                        .Where(x => x[0] == "vt")
-                        .Select(x => x.Skip(1).ToArray())
-                        .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList(); 
-                    */
+                    //listVt = temp
+                    //    .Where(x => x[0] == "vt")
+                    //    .Select(x => x.Skip(1).ToArray())
+                    //    .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
 
                     //listF = vertices
                     //    .Where(x => x.StartsWith('f') == true)

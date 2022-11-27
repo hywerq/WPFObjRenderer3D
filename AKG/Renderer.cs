@@ -107,65 +107,65 @@ namespace AKG
             image.Source = bitmap;
         }
 
-        private void FindNormals()
-        {
-            triangleNormals.Clear();
-            vertexNormals.Clear();
+        //private void FindNormals()
+        //{
+        //    triangleNormals.Clear();
+        //    vertexNormals.Clear();
 
-            foreach (int[] vector in Model.listF)
-            {
-                for (int j = 3; j < vector.Length - 3; j += 3)
-                {
-                    //Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
-                    Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
+        //    foreach (int[] vector in Model.listF)
+        //    {
+        //        for (int j = 3; j < vector.Length - 3; j += 3)
+        //        {
+        //            //Vector4[] screenTriangle = { Model.screenVertices[vector[0] - 1], Model.screenVertices[vector[j] - 1], Model.screenVertices[vector[j + 3] - 1] };
+        //            Vector3[] worldTriangle = { Model.worldVertices[vector[0] - 1], Model.worldVertices[vector[j] - 1], Model.worldVertices[vector[j + 3] - 1] };
 
-                    //Отбраковка невидимых поверхностей.
-                    /*Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
-                    Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
+        //            //Отбраковка невидимых поверхностей.
+        //            /*Vector4 edge1 = screenTriangle[2] - screenTriangle[0];
+        //            Vector4 edge2 = screenTriangle[1] - screenTriangle[0];
 
-                    if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
-                    {
-                        continue;
-                    }*/
+        //            if (edge1.X * edge2.Y - edge1.Y * edge2.X <= 0)
+        //            {
+        //                continue;
+        //            }*/
 
-                    Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
-                    Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
+        //            Vector3 worldEdge1 = worldTriangle[1] - worldTriangle[0];
+        //            Vector3 worldEdge2 = worldTriangle[2] - worldTriangle[0];
 
-                    Vector3 normal = Vector3.Cross(worldEdge1, worldEdge2);
-                    normal = Vector3.Normalize(normal);
+        //            Vector3 normal = Vector3.Cross(worldEdge1, worldEdge2);
+        //            normal = Vector3.Normalize(normal);
 
-                    foreach (Vector3 vertex in worldTriangle)
-                    {
-                        if (triangleNormals.ContainsKey(vertex))
-                        {
-                            triangleNormals[vertex].Add(normal);
-                        }
-                        else
-                        {
-                            triangleNormals.Add(vertex, new List<Vector3>() { normal });
-                        }
-                    }
-                }
-            }
+        //            foreach (Vector3 vertex in worldTriangle)
+        //            {
+        //                if (triangleNormals.ContainsKey(vertex))
+        //                {
+        //                    triangleNormals[vertex].Add(normal);
+        //                }
+        //                else
+        //                {
+        //                    triangleNormals.Add(vertex, new List<Vector3>() { normal });
+        //                }
+        //            }
+        //        }
+        //    }
 
-            foreach(var item in triangleNormals)
-            {
-                Vector3 temp = Vector3.Zero;
+        //    foreach(var item in triangleNormals)
+        //    {
+        //        Vector3 temp = Vector3.Zero;
 
-                for(int i = 0; i < item.Value.Count; i++)
-                {
-                    temp += item.Value[i];
-                }
+        //        for(int i = 0; i < item.Value.Count; i++)
+        //        {
+        //            temp += item.Value[i];
+        //        }
 
-                vertexNormals.Add(item.Key, temp / item.Value.Count);
-            }
-        }
+        //        vertexNormals.Add(item.Key, temp / item.Value.Count);
+        //    }
+        //}
 
         private void Rasterization(WriteableBitmap bitmap)
         {
             float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
 
-            FindNormals();
+            //FindNormals();
 
             foreach (int[] vector in Model.listF)
             {
@@ -184,27 +184,34 @@ namespace AKG
                         continue;
                     }
 
+                    // Поиск нормали по вершинам.
+                    Vector3 vertexNormal0 = Vector3.Normalize(Model.listVn[vector[2] - 1]);
+                    Vector3 vertexNormal1 = Vector3.Normalize(Model.listVn[vector[j + 2] - 1]);
+                    Vector3 vertexNormal2 = Vector3.Normalize(Model.listVn[vector[j + 5] - 1]);
+
                     // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
                     {
                         (screenTriangle[0], screenTriangle[1]) = (screenTriangle[1], screenTriangle[0]);
                         (worldTriangle[0], worldTriangle[1]) = (worldTriangle[1], worldTriangle[0]);
+                        (vertexNormal0, vertexNormal1) = (vertexNormal1, vertexNormal0);
                     }
                     if (screenTriangle[0].Y > screenTriangle[2].Y)
                     {
                         (screenTriangle[0], screenTriangle[2]) = (screenTriangle[2], screenTriangle[0]);
                         (worldTriangle[0], worldTriangle[2]) = (worldTriangle[2], worldTriangle[0]);
+                        (vertexNormal0, vertexNormal2) = (vertexNormal2, vertexNormal0);
                     }
                     if (screenTriangle[1].Y > screenTriangle[2].Y)
                     {
                         (screenTriangle[1], screenTriangle[2]) = (screenTriangle[2], screenTriangle[1]);
                         (worldTriangle[1], worldTriangle[2]) = (worldTriangle[2], worldTriangle[1]);
+                        (vertexNormal1, vertexNormal2) = (vertexNormal2, vertexNormal1);
                     }
 
-                    // Поиск нормали по вершинам.
-                    Vector3 vertexNormal0 = vertexNormals[new Vector3(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z)];
-                    Vector3 vertexNormal1 = vertexNormals[new Vector3(worldTriangle[1].X, worldTriangle[1].Y, worldTriangle[1].Z)];
-                    Vector3 vertexNormal2 = vertexNormals[new Vector3(worldTriangle[2].X, worldTriangle[2].Y, worldTriangle[2].Z)];
+                    //Vector3 vertexNormal0 = vertexNormals[new Vector3(worldTriangle[0].X, worldTriangle[0].Y, worldTriangle[0].Z)];
+                    //Vector3 vertexNormal1 = vertexNormals[new Vector3(worldTriangle[1].X, worldTriangle[1].Y, worldTriangle[1].Z)];
+                    //Vector3 vertexNormal2 = vertexNormals[new Vector3(worldTriangle[2].X, worldTriangle[2].Y, worldTriangle[2].Z)];
 
                     // Нахождение коэффицентов в экранных и мировых координатах, коэффицента для нормалей.
                     Vector4 screenKoeff01       = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);

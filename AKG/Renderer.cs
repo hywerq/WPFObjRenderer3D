@@ -18,11 +18,11 @@ namespace AKG
         private Vector3 diffuseColor = new Vector3 ( 87, 171, 105 );
         private Vector3 specularColor = new Vector3 ( 212, 21, 21 ); 
 
-        private float ambientFactor = 1.0f;
+        private float ambientFactor = 0.5f;
         private float diffuseFactor = 0.8f;
         private float specularFactor = 0.3f;
 
-        private float glossFactor = 0.3f;
+        private float glossFactor = 0.7f;
 
         private Vector3 objectColor = new(255, 255, 255);
         private Vector3 lightColor = new(0.5f, 0.5f, 0f);

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AKG"
         mc:Ignorable="d"
-        Name="window" Title="MainWindow" WindowState="Maximized" Height="1080" Width="1920" KeyDown="window_KeyDown" SizeChanged="window_SizeChanged">
+        Name="window" Title="MainWindow" WindowState="Maximized" Height="694" Width="1294" KeyDown="window_KeyDown" SizeChanged="window_SizeChanged">
     <Grid>
         <Grid.Background>
             <RadialGradientBrush>
@@ -22,6 +22,11 @@
 
         </Image>
 
+        <Label Content="Width:" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="60,74,700,331" Foreground="White"></Label>
+        <Label Content="Height:" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualHeight}" Margin="63,93,692,312" Foreground="White"></Label>
+
         <Label Content="X Angle:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbRotateX" Content="0" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Foreground="White"/>
 
@@ -36,12 +41,14 @@
 
         <Label Content="World position:" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbPos" Content="0, 0, 0" HorizontalAlignment="Left" Margin="101,113,0,0" VerticalAlignment="Top" Foreground="White"/>
-        
-        <Label Content="W, A, S, D, E, Q - for moving. I, J, K, L, U, O - for rotating. T, G - for scaling." HorizontalAlignment="Left" Margin="1513,5,0,0" VerticalAlignment="Top" Foreground="White"/>
 
-        <Label Content="Width:" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualWidth}" Margin="60,74,700,331" Foreground="White"></Label>
-        <Label Content="Height:" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <Label Content="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=ActualHeight}" Margin="63,93,692,312" Foreground="White"></Label>
+        <Label Content="W, A, S, D, E, Q - for moving. I, J, K, L, U, O - for rotating. T, G - for scaling." Margin="0,10,10,0" Foreground="White" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="397"/>
+
+        <GroupBox Header="Serial Port" Margin="0,0,10,10" Foreground="White" HorizontalAlignment="Right" Width="135" Height="108" VerticalAlignment="Bottom">
+            <Grid HorizontalAlignment="Center" Width="123">
+                <RadioButton Content="Rotation" IsChecked="True" Margin="0,17,0,0" Height="23" VerticalAlignment="Top" HorizontalAlignment="Center" Width="85" Foreground="White" Checked="RotationButton_Checked"/>
+                <RadioButton Content="Lightning" Margin="0,45,0,17" Height="23" HorizontalAlignment="Center" Width="87" Foreground="White" Checked="LightningButton_Checked"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>

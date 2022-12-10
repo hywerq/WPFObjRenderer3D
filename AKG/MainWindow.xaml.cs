@@ -1,5 +1,8 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace AKG
 {
@@ -94,12 +97,64 @@ namespace AKG
                 Model.ReadFile("..\\..\\..\\objects\\Model.obj");
 
                 VectorTransformation.UpdateViewPort();
-
                 VectorTransformation.UpdateCameraBasicVectors();
                 VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
 
                 renderer.DrawModel();
+
+                StartSerialPortHandle();
             };
+        }
+
+        private void StartSerialPortHandle()
+        {
+            Task.Run(() => SerialPortHandler.Start());
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (SerialPortHandler.RotationBuffer.Count > 0)
+                    {
+                        float value = SerialPortHandler.RotationBuffer[0];
+                        float angleShiftValue = Math.Abs(value - (float)angleY);
+
+                        Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+                        {
+                            if(angleShiftValue > 0.2f)
+                            {
+                                angleY = value;
+
+                                VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
+                                renderer.DrawModel();
+                            }
+                        });
+
+                        SerialPortHandler.RotationBuffer.RemoveAt(0);
+                    }
+
+                    if (SerialPortHandler.LightBuffer.Count > 0)
+                    {
+                        int value = SerialPortHandler.LightBuffer[0];
+                        int lightShiftValue = Math.Abs(value - (int)VectorTransformation.light.Z);
+
+                        Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+                        {
+                            if (lightShiftValue > 10)
+                            {
+                                VectorTransformation.light.Z =
+                                    VectorTransformation.light.Z < value ?
+                                    VectorTransformation.light.Z + lightShiftValue :
+                                    VectorTransformation.light.Z - lightShiftValue;
+
+                                VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
+                                renderer.DrawModel();
+                            }
+                        });
+
+                        SerialPortHandler.LightBuffer.RemoveAt(0);
+                    }
+                }
+            });
         }
 
         private void window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -250,6 +305,16 @@ namespace AKG
             VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
             
             renderer.DrawModel();
+        }
+
+        private void RotationButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SerialPortHandler.SendCommand("R");
+        }
+
+        private void LightningButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SerialPortHandler.SendCommand("L");
         }
     }
 }

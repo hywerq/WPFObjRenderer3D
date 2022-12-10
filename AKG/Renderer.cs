@@ -18,14 +18,14 @@ namespace AKG
         private Vector3 diffuseColor = new Vector3 ( 87, 171, 105 );
         private Vector3 specularColor = new Vector3 ( 212, 21, 21 ); 
 
-        private float ambientFactor = 0.5f;
-        private float diffuseFactor = 0.8f;
-        private float specularFactor = 0.3f;
+        private float ambientFactor = 1.0f;
+        private float diffuseFactor = 1.0f;
+        private float specularFactor = 0.2f;
 
-        private float glossFactor = 0.7f;
+        private float glossFactor = 1f;
 
-        private Vector3 objectColor = new(255, 255, 255);
-        private Vector3 lightColor = new(0.5f, 0.5f, 0f);
+        private Vector3 objectColor = new(0, 0, 255);
+        private Vector3 lightColor = new(1f, 1f, 1f);
 
         private Dictionary<Vector3, List<Vector3>> triangleNormals = new();
         private Dictionary<Vector3, Vector3> vertexNormals = new();
@@ -60,7 +60,7 @@ namespace AKG
         private int[] SpecularLightning(Vector3 View, Vector3 lightDirection, Vector3 normal)
         {
             Vector3 reflection = Vector3.Normalize(Vector3.Reflect(lightDirection, normal));
-            float RV = Math.Max(Vector3.Dot(reflection, View), 0);
+            float RV = Math.Max(Vector3.Dot(reflection, -View), 0);
 
             int[] values = new int[3];
             double temp = Math.Pow(RV, glossFactor);
@@ -185,9 +185,9 @@ namespace AKG
                     }
 
                     // Поиск нормали по вершинам.
-                    Vector3 vertexNormal0 = Vector3.Normalize(Model.listVn[vector[2] - 1]);
-                    Vector3 vertexNormal1 = Vector3.Normalize(Model.listVn[vector[j + 2] - 1]);
-                    Vector3 vertexNormal2 = Vector3.Normalize(Model.listVn[vector[j + 5] - 1]);
+                    Vector3 vertexNormal0 = Vector3.Normalize(Model.worldNormals[vector[2] - 1]);
+                    Vector3 vertexNormal1 = Vector3.Normalize(Model.worldNormals[vector[j + 2] - 1]);
+                    Vector3 vertexNormal2 = Vector3.Normalize(Model.worldNormals[vector[j + 5] - 1]);
 
                     // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -276,7 +276,9 @@ namespace AKG
                                 z_buff[y, x] = pScreen.Z;
 
                                 // Нахождение обратного вектора направления света.
-                                Vector3 lightDirection = Vector3.Normalize(VectorTransformation.light - pWorld);
+                                Vector3 lightDirection = Vector3.Normalize(pWorld - VectorTransformation.light);
+                                Vector3 viewDirection = Vector3.Normalize(pWorld - VectorTransformation.eye );
+
 
                                 // Нахождение нормали для точки.
                                 Vector3 normal = normalA + (x - screenA.X) * normalKoeff;
@@ -287,12 +289,12 @@ namespace AKG
                                 // Затенение объекта в зависимости от дистанции света до модели.
                                 float attenuation = 1 / Math.Max(distance, 0.01f);
                                 // Получение затененности каждой точки.
-                                float intensity = Math.Max(Vector3.Dot(normal, lightDirection), 0);
+                                float intensity = Math.Max(Vector3.Dot(normal, -lightDirection), 0);
 
                                 // Освещение Фонга.
                                 int[] ambientValues = AmbientLightning();
                                 int[] diffuseValues = DiffuseLightning(intensity * attenuation);
-                                int[] specularValues = SpecularLightning(pWorld - VectorTransformation.eye, lightDirection, normal);
+                                int[] specularValues = SpecularLightning(viewDirection, lightDirection, normal);
 
                                 // Отрисовка.
                                 DrawPixel(bitmap, x, y, ambientValues, diffuseValues, specularValues);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Numerics;
 using System.Threading.Tasks;
 
@@ -57,6 +58,7 @@ namespace AKG
         {
             Model.screenVertices = new Vector4[Model.listV.Count];
             Model.worldVertices = new Vector3[Model.listV.Count];
+            Model.worldNormals = new Vector3[Model.listVn.Count];
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
@@ -69,15 +71,28 @@ namespace AKG
 
             Matrix4x4 Projection_View_Model = World * View * Projection;
 
-            Parallel.For(0, Model.listV.Count,
-                   (i) =>
-                   {
-                       Model.worldVertices[i] = Vector3.Transform(Model.listV[i], World);
-                       Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
-                       Model.screenVertices[i] /= Model.screenVertices[i].W;
-                       Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
-                   }
-                );
+            if (Model.listV.Count > 0)
+            {
+                Parallel.ForEach(Partitioner.Create(0, Model.listV.Count), range =>
+                       {
+                           for (int i = range.Item1; i < range.Item2; i++)
+                           {
+                               Model.worldVertices[i] = Vector3.Transform(Model.listV[i], World);
+                               Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
+                               Model.screenVertices[i] /= Model.screenVertices[i].W;
+                               Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
+                           }
+                       }
+                    );
+                Parallel.ForEach(Partitioner.Create(0, Model.listVn.Count), range =>
+                       {
+                           for (int i = range.Item1; i < range.Item2; i++)
+                           {
+                               Model.worldNormals[i] = Vector3.TransformNormal(Model.listVn[i], World);
+                           }
+                       }
+                    );
+            }
         }
     }
 }

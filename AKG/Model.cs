@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -18,6 +17,7 @@ namespace AKG
         public static List<Vector3> listVt = new List<Vector3>();
         public static Vector4[] screenVertices;
         public static Vector3[] worldVertices;
+        public static Vector3[] worldNormals;
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 

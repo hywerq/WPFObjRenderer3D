@@ -59,6 +59,7 @@ namespace AKG
             Model.screenVertices = new Vector4[Model.listV.Count];
             Model.worldVertices = new Vector3[Model.listV.Count];
             Model.worldNormals = new Vector3[Model.listVn.Count];
+            Model.textures = new Vector2[Model.listVt.Count];
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
@@ -83,7 +84,7 @@ namespace AKG
                                Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
                            }
                        }
-                    );
+                );
                 Parallel.ForEach(Partitioner.Create(0, Model.listVn.Count), range =>
                        {
                            for (int i = range.Item1; i < range.Item2; i++)
@@ -91,7 +92,15 @@ namespace AKG
                                Model.worldNormals[i] = Vector3.TransformNormal(Model.listVn[i], World);
                            }
                        }
-                    );
+                );
+                Parallel.ForEach(Partitioner.Create(0, Model.listVt.Count), range =>
+                    {
+                        for (int i = range.Item1; i < range.Item2; i++)
+                        {
+                            Model.textures[i] = Model.listVt[i];
+                        }
+                    }
+                );
             }
         }
     }

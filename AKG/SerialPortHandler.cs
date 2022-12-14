@@ -20,7 +20,7 @@ namespace AKG
         {
             serialPort.ReadTimeout = 500;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceived);
-            serialPort.Open();
+            //serialPort.Open();
         }
 
         public static void SendCommand(string command)

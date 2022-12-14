@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -14,18 +15,22 @@ namespace AKG
         public static List<int[]> listF = new List<int[]>();
         public static List<int[]> listF2 = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
-        public static List<Vector3> listVt = new List<Vector3>();
+        public static List<Vector2> listVt = new List<Vector2>();
         public static Vector4[] screenVertices;
         public static Vector3[] worldVertices;
         public static Vector3[] worldNormals;
+        public static Vector2[] textures;
+        public static Bitmap textureFile;
+        public static Bitmap mirrorMap;
+        public static Bitmap normalMap;
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 
-        public static void ReadFile(string path)
+        public static void ReadFile(string filePath, string diffuseMapPath, string mirrorMapPath, string normalMapPath)
         {
             try
             {
-                using (var sr = new StreamReader(path))
+                using (var sr = new StreamReader(filePath))
                 {
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
@@ -43,10 +48,10 @@ namespace AKG
                         .Select(x => x.Skip(1).ToArray())
                         .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
 
-                    //listVt = temp
-                    //    .Where(x => x[0] == "vt")
-                    //    .Select(x => x.Skip(1).ToArray())
-                    //    .Select(x => new Vector3(Array.ConvertAll(x, float.Parse))).ToList();
+                    listVt = temp
+                        .Where(x => x[0] == "vt")
+                        .Select(x => x.Skip(1).ToArray())
+                        .Select(x => new Vector2(Array.ConvertAll(x, float.Parse))).ToList();
 
                     //listF = vertices
                     //    .Where(x => x.StartsWith('f') == true)
@@ -97,6 +102,10 @@ namespace AKG
                     var inListButNotInList2 = listF.Except(listF2).ToList();
                     var inList2ButNotInList = listF2.Except(listF).ToList();
                 }
+
+                textureFile = (Bitmap)Bitmap.FromFile(diffuseMapPath);
+                mirrorMap = (Bitmap)Bitmap.FromFile(mirrorMapPath);
+                normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
 
                 //foreach (string line in File.ReadLines(path))
                 //{

@@ -94,7 +94,10 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\Model.obj");
+                Model.ReadFile("..\\..\\..\\objects\\Model.obj",
+                               "..\\..\\..\\objects\\textures\\shovel_diffuse.png",
+                               "..\\..\\..\\objects\\textures\\shovel_Metalnes.png",
+                               "..\\..\\..\\objects\\textures\\shovel_normal_map_flip.png");
 
                 VectorTransformation.UpdateViewPort();
                 VectorTransformation.UpdateCameraBasicVectors();
@@ -282,13 +285,13 @@ namespace AKG
                     renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.RightShift:
-                    VectorTransformation.light.Y += 1;
+                    VectorTransformation.light.Y += 10;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
                     renderer.DrawModel();
                     break;
                 case System.Windows.Input.Key.RightCtrl:
-                    VectorTransformation.light.Y -= 1;
+                    VectorTransformation.light.Y -= 10;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
                     renderer.DrawModel();

@@ -236,6 +236,8 @@ namespace AKG
                                 Vector3 viewDirection = Vector3.Normalize(pWorld - VectorTransformation.eye);
 
                                 Vector2 texture = textureA + (x - screenA.X) * textureKoeff;
+                                //Vector2 affine = (Vector2.One - textureKoeff) * textureA + textureKoeff * textureB;
+                                //Vector2 perpective = ((Vector2.One - textureKoeff) * (textureA / worldA.Z) + textureKoeff * (textureB / worldB.Z)) / ((Vector2.One - textureKoeff) * (1 / worldA.Z) + textureKoeff * (1 / worldB.Z));
 
                                 // Цвет объекта, цвет отражений
                                 System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * Model.textureFile.Width), Convert.ToInt32((1 - texture.Y) * Model.textureFile.Height));
@@ -244,13 +246,13 @@ namespace AKG
                                 Vector3 specular = new Vector3(spcColor.R, spcColor.G, spcColor.B);
 
                                 // Нахождение нормали для точки.
-                                //Vector3 normal = normalA + (x - screenA.X) * normalKoeff;
-                                //normal = Vector3.Normalize(normal);
-
-                                System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
-                                Vector3 normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
-                                normal *= 2 - 1;
+                                Vector3 normal = normalA + (x - screenA.X) * normalKoeff;
                                 normal = Vector3.Normalize(normal);
+
+                                //System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
+                                //Vector3 normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
+                                //normal *= 2 - 1;
+                                //normal = Vector3.Normalize(normal);
 
                                 // Нахождение дистанции до источника света.
                                 float distance = lightDirection.LengthSquared();

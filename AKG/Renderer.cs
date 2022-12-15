@@ -235,17 +235,22 @@ namespace AKG
                                 Vector3 lightDirection = Vector3.Normalize(pWorld - VectorTransformation.light);
                                 Vector3 viewDirection = Vector3.Normalize(pWorld - VectorTransformation.eye);
 
+                                // original
                                 Vector2 texture = textureA + (x - screenA.X) * textureKoeff;
+                                // affine
                                 //Vector2 affine = (Vector2.One - textureKoeff) * textureA + textureKoeff * textureB;
-                                //Vector2 perpective = ((Vector2.One - textureKoeff) * (textureA / worldA.Z) + textureKoeff * (textureB / worldB.Z)) / ((Vector2.One - textureKoeff) * (1 / worldA.Z) + textureKoeff * (1 / worldB.Z));
+                                // perspective
+                                //Vector2 texture = ((Vector2.One - textureKoeff) * (textureA / worldA.Z) + textureKoeff * (textureB / worldB.Z)) / ((Vector2.One - textureKoeff) * (1 / worldA.Z) + textureKoeff * (1 / worldB.Z));
 
-                                // Цвет объекта, цвет отражений
+                                // Цвет объекта.
                                 Vector3 color = new Vector3(235, 163, 9);
                                 if (Model.textureFile != null)
                                 {
                                     System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * Model.textureFile.Width), Convert.ToInt32((1 - texture.Y) * Model.textureFile.Height));
                                     color = new Vector3(objColor.R, objColor.G, objColor.B);
                                 }
+
+                                // Цвет отражения.
                                 Vector3 specular = new Vector3(212, 21, 21);
                                 if (Model.mirrorMap != null)
                                 {
@@ -259,7 +264,7 @@ namespace AKG
                                 {
                                     System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
                                     normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
-                                    normal *= 2 - 1;
+                                    normal = (normal * 2) - Vector3.One;
                                     normal = Vector3.Normalize(normal);
                                 }
                                 else

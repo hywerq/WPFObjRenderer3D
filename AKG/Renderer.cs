@@ -263,7 +263,7 @@ namespace AKG
                                 if (Model.normalMap != null)
                                 {
                                     System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
-                                    normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
+                                    normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
                                     normal = (normal * 2) - Vector3.One;
                                     normal = Vector3.Normalize(normal);
                                 }

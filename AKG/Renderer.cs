@@ -18,10 +18,7 @@ namespace AKG
         private float diffuseFactor = 1.0f;
         private float specularFactor = 0.2f;
 
-        private float glossFactor = 1f;
-
-        private Vector3 objectColor = new(0, 0, 255);
-        private Vector3 lightColor = new(1f, 1f, 1f);
+        private float glossFactor = 5f;
 
         private Dictionary<Vector3, List<Vector3>> triangleNormals = new();
         private Dictionary<Vector3, Vector3> vertexNormals = new();
@@ -74,10 +71,12 @@ namespace AKG
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
+                float lightIntensity = 0.3f;
+
                 temp[3] = 255;
-                temp[2] = (byte)Math.Min(ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
-                temp[1] = (byte)Math.Min(ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
-                temp[0] = (byte)Math.Min(ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
+                temp[2] = (byte)Math.Min(lightIntensity * ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
+                temp[1] = (byte)Math.Min(lightIntensity * ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
+                temp[0] = (byte)Math.Min(lightIntensity * ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
             }
         }
 

@@ -17,9 +17,6 @@ namespace AKG
         private static double _angleY = 0;
         private static double _angleZ = 0;
         private static double _scale = 1;
-
-        private static string _file = "Sword";
-
         public static Vector3 movement = new(0, 0, 0);
 
         public double angleX
@@ -97,10 +94,10 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\" + _file + "\\Model.obj",
-                               "..\\..\\..\\objects\\" + _file + "\\textures\\diffuse.png",
-                               "..\\..\\..\\objects\\" + _file + "\\textures\\specular.png",
-                               "..\\..\\..\\objects\\" + _file + "\\textures\\normal.png");
+                Model.ReadFile("..\\..\\..\\objects\\Model.obj",
+                               "..\\..\\..\\objects\\textures\\shovel_diffuse.png",
+                               "..\\..\\..\\objects\\textures\\shovel_Metalnes.png",
+                               "..\\..\\..\\objects\\textures\\shovel_normal_map_flip.png");
 
                 VectorTransformation.UpdateViewPort();
                 VectorTransformation.UpdateCameraBasicVectors();

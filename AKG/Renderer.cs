@@ -240,19 +240,33 @@ namespace AKG
                                 //Vector2 perpective = ((Vector2.One - textureKoeff) * (textureA / worldA.Z) + textureKoeff * (textureB / worldB.Z)) / ((Vector2.One - textureKoeff) * (1 / worldA.Z) + textureKoeff * (1 / worldB.Z));
 
                                 // Цвет объекта, цвет отражений
-                                System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * Model.textureFile.Width), Convert.ToInt32((1 - texture.Y) * Model.textureFile.Height));
-                                System.Drawing.Color spcColor = Model.mirrorMap.GetPixel(Convert.ToInt32(texture.X * Model.mirrorMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mirrorMap.Height));
-                                Vector3 color = new Vector3(objColor.R, objColor.G, objColor.B);
-                                Vector3 specular = new Vector3(spcColor.R, spcColor.G, spcColor.B);
+                                Vector3 color = new Vector3(235, 163, 9);
+                                if (Model.textureFile != null)
+                                {
+                                    System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * Model.textureFile.Width), Convert.ToInt32((1 - texture.Y) * Model.textureFile.Height));
+                                    color = new Vector3(objColor.R, objColor.G, objColor.B);
+                                }
+                                Vector3 specular = new Vector3(212, 21, 21);
+                                if (Model.mirrorMap != null)
+                                {
+                                    System.Drawing.Color spcColor = Model.mirrorMap.GetPixel(Convert.ToInt32(texture.X * Model.mirrorMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mirrorMap.Height));
+                                    specular = new Vector3(spcColor.R, spcColor.G, spcColor.B);
+                                }
 
                                 // Нахождение нормали для точки.
-                                Vector3 normal = normalA + (x - screenA.X) * normalKoeff;
-                                normal = Vector3.Normalize(normal);
-
-                                //System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
-                                //Vector3 normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
-                                //normal *= 2 - 1;
-                                //normal = Vector3.Normalize(normal);
+                                Vector3 normal = Vector3.One;
+                                if (Model.normalMap != null)
+                                {
+                                    System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
+                                    normal = new Vector3(normalColor.R / 255, normalColor.G / 255, normalColor.B / 255);
+                                    normal *= 2 - 1;
+                                    normal = Vector3.Normalize(normal);
+                                }
+                                else
+                                {
+                                    normal = normalA + (x - screenA.X) * normalKoeff;
+                                    normal = Vector3.Normalize(normal);
+                                }
 
                                 // Нахождение дистанции до источника света.
                                 float distance = lightDirection.LengthSquared();

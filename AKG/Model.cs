@@ -16,10 +16,12 @@ namespace AKG
         public static List<int[]> listF2 = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector2> listVt = new List<Vector2>();
+
         public static Vector4[] screenVertices;
         public static Vector3[] worldVertices;
         public static Vector3[] worldNormals;
         public static Vector2[] textures;
+
         public static Bitmap textureFile;
         public static Bitmap mirrorMap;
         public static Bitmap normalMap;
@@ -103,9 +105,30 @@ namespace AKG
                     var inList2ButNotInList = listF2.Except(listF).ToList();
                 }
 
-                textureFile = (Bitmap)Bitmap.FromFile(diffuseMapPath);
-                mirrorMap = (Bitmap)Bitmap.FromFile(mirrorMapPath);
-                normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
+                try
+                {
+                    textureFile = (Bitmap)Bitmap.FromFile(diffuseMapPath);
+                }
+                catch (Exception ex)
+                {
+                    textureFile = null;
+                }
+                try
+                {
+                    mirrorMap = (Bitmap)Bitmap.FromFile(mirrorMapPath);
+                }
+                catch (Exception ex)
+                {
+                    mirrorMap = null;
+                }
+                try
+                {
+                    normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
+                }
+                catch (Exception ex)
+                {
+                    normalMap = null;
+                }
 
                 //foreach (string line in File.ReadLines(path))
                 //{

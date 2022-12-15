@@ -18,7 +18,7 @@ namespace AKG
         private static double _angleZ = 0;
         private static double _scale = 1;
 
-        private static string _file = "Sword";
+        private static string _file = "Shovel Knight";
 
         public static Vector3 movement = new(0, 0, 0);
 

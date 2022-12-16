@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace AKG
 {
@@ -17,6 +18,7 @@ namespace AKG
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector2> listVt = new List<Vector2>();
 
+        public static Vector3[,] fileNormals;
         public static Vector4[] screenVertices;
         public static Vector3[] worldVertices;
         public static Vector3[] worldNormals;
@@ -113,6 +115,7 @@ namespace AKG
                 {
                     textureFile = null;
                 }
+
                 try
                 {
                     mirrorMap = (Bitmap)Bitmap.FromFile(mirrorMapPath);
@@ -121,14 +124,29 @@ namespace AKG
                 {
                     mirrorMap = null;
                 }
+
                 try
                 {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
+                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
+                    
+                    for (int i = 0; i < normalMap.Width; i++)
+                    {
+                        for (int j = 0; j < normalMap.Height; j++)
+                        {
+                            Color normalColor = normalMap.GetPixel(i, j);
+                            Vector3 normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
+                            normal = (normal * 2) - Vector3.One;
+                            normal = Vector3.Normalize(normal);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     normalMap = null;
                 }
+
+
 
                 //foreach (string line in File.ReadLines(path))
                 //{

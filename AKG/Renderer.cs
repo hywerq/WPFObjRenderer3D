@@ -71,7 +71,7 @@ namespace AKG
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
 
-                float lightIntensity = 0.3f;
+                float lightIntensity = 1.0f;
 
                 temp[3] = 255;
                 temp[2] = (byte)Math.Min(lightIntensity * ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
@@ -131,9 +131,9 @@ namespace AKG
                     Vector3 vertexNormal2 = Vector3.Normalize(Model.worldNormals[vector[j + 5] - 1]);
 
                     // Поиск текстурной координаты по вершине
-                    Vector2 texture0 = Model.textures[vector[1] - 1];
-                    Vector2 texture1 = Model.textures[vector[j + 1] - 1];
-                    Vector2 texture2 = Model.textures[vector[j + 4] - 1];
+                    Vector2 texture0 = Model.textures[vector[1] - 1]    ;/*/ screenTriangle[0].Z;*/
+                    Vector2 texture1 = Model.textures[vector[j + 1] - 1];/*/ screenTriangle[1].Z;*/
+                    Vector2 texture2 = Model.textures[vector[j + 4] - 1];/*/ screenTriangle[2].Z;*/
 
                     // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -236,10 +236,16 @@ namespace AKG
 
                                 // original
                                 Vector2 texture = textureA + (x - screenA.X) * textureKoeff;
+                                //texture /= Vector2.One / pScreen.Z;
+
                                 // affine
-                                //Vector2 affine = (Vector2.One - textureKoeff) * textureA + textureKoeff * textureB;
+                                //Vector2 texture = (Vector2.One - textureKoeff) * textureA + textureKoeff * textureB;
+
                                 // perspective
-                                //Vector2 texture = ((Vector2.One - textureKoeff) * (textureA / worldA.Z) + textureKoeff * (textureB / worldB.Z)) / ((Vector2.One - textureKoeff) * (1 / worldA.Z) + textureKoeff * (1 / worldB.Z));
+                                /*Vector2 texture = ((Vector2.One - textureKoeff) * (textureA / screenA.Z) +
+                                                    textureKoeff * (textureB / screenB.Z)) /
+                                                  ((Vector2.One - textureKoeff) * (1 / screenA.Z) +
+                                                    textureKoeff * (1 / screenB.Z));*/
 
                                 // Цвет объекта.
                                 Vector3 color = new Vector3(235, 163, 9);
@@ -261,10 +267,11 @@ namespace AKG
                                 Vector3 normal = Vector3.One;
                                 if (Model.normalMap != null)
                                 {
-                                    System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
-                                    normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
-                                    normal = (normal * 2) - Vector3.One;
-                                    normal = Vector3.Normalize(normal);
+                                    //System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
+                                    //normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
+                                    //normal = (normal * 2) - Vector3.One;
+                                    //normal = Vector3.Normalize(normal);
+                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
                                 }
                                 else
                                 {

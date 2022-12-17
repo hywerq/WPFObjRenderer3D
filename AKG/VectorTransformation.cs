@@ -97,7 +97,7 @@ namespace AKG
                        }
                 );
 
-                if (Model.normalMap != null)
+/*                if (Model.normalMap != null)
                 {
                     Parallel.For(0, Model.fileNormals.GetLength(0), i =>
                         {
@@ -108,7 +108,7 @@ namespace AKG
                             );
                         }
                     );
-                }
+                }*/
 
                 Parallel.ForEach(Partitioner.Create(0, Model.listVt.Count), range =>
                     {

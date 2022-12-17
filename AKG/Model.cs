@@ -128,8 +128,8 @@ namespace AKG
                 try
                 {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
-                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
-                    
+/*                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
+
                     for (int i = 0; i < normalMap.Width; i++)
                     {
                         for (int j = 0; j < normalMap.Height; j++)
@@ -139,7 +139,7 @@ namespace AKG
                             normal = (normal * 2) - Vector3.One;
                             normal = Vector3.Normalize(normal);
                         }
-                    }
+                    }*/
                 }
                 catch (Exception ex)
                 {

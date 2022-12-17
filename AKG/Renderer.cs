@@ -15,10 +15,11 @@ namespace AKG
         //private Vector3 normal, lightDirection;
 
         private float ambientFactor = 1.0f;
-        private float diffuseFactor = 1.0f;
+        private float diffuseFactor = 1.0f; 
         private float specularFactor = 0.2f;
 
         private float glossFactor = 5f;
+        private float roughness = 2f;
 
         private Dictionary<Vector3, List<Vector3>> triangleNormals = new();
         private Dictionary<Vector3, Vector3> vertexNormals = new();
@@ -65,6 +66,56 @@ namespace AKG
             return values;
         }
 
+        private float ThrowbridgeReitzNormalDistribution(float roughness, Vector3 normal, Vector3 halfWayVec)
+        {
+            float NdotH = Math.Max(Vector3.Dot(normal, halfWayVec), 0.0f);
+            float numerator = (float)Math.Pow(roughness, 2.0);
+            float denominator = (float)(Math.PI * Math.Pow(Math.Pow(NdotH, 2.0) * Math.Pow(roughness, 2.0) - 1.0, 2.0));
+            denominator = (float)Math.Max(denominator, 0.000001f);
+
+            return numerator / denominator;
+        }
+
+        private float GetSchlickBeckmannFactor(float roughness, Vector3 normal, Vector3 x /* V or L */)
+        {
+            float k = roughness / 2.0f;
+            float numerator = (float)Math.Max(Vector3.Dot(normal, x), 0.0);
+            float denominator = (float)Math.Max(Vector3.Dot(normal, x), 0.0) * (1.0f - k) + k;
+            denominator = (float)Math.Max(denominator, 0.000001f);
+
+            return numerator / denominator;
+        }
+
+        private float GetSmithFactor(float roughness, Vector3 normal, Vector3 view, Vector3 light)
+        {
+            return GetSchlickBeckmannFactor(roughness, normal, view) * GetSchlickBeckmannFactor(roughness, normal, light);
+        }
+
+        private Vector3 GetFresnelSchlickFactor(Vector3 f0, Vector3 view, Vector3 halfWayVec)
+        {
+            Vector3 temp = new((float)Math.Pow(1 - Math.Max(Vector3.Dot(view, halfWayVec), 0.0), 5.0));
+            return f0 + (Vector3.One - f0) * temp;
+        }    
+
+        private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 albedo, Vector3 specular, Vector3 normal, Vector3 view, Vector3 light, Vector3 halfWayVec)
+        {
+            Vector3 ks = GetFresnelSchlickFactor(specular, view, halfWayVec);
+            Vector3 kd = Vector3.One - ks;
+
+            Vector3 lambert = albedo / (float)Math.PI;
+
+            Vector3 cookTorranceNumerator = ThrowbridgeReitzNormalDistribution(roughness, normal, halfWayVec)
+                * GetSmithFactor(roughness, normal, view, light) * ks;
+            float cookTorranceDenominator = 4.0f * (float)Math.Max(Vector3.Dot(view, normal), 0.0) 
+                * (float)Math.Max(Vector3.Dot(light, normal), 0.0);
+            cookTorranceDenominator = (float)Math.Max(cookTorranceDenominator, 0.000001f);
+
+            Vector3 cookTorrance = cookTorranceNumerator / cookTorranceDenominator;
+            Vector3 brdf = kd * lambert + cookTorrance;
+
+            return brdf * lightColor * (float)Math.Max(Vector3.Dot(light, normal), 0.0);
+        }
+         
         private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, int[] ambientValues, int[] diffuseValues, int[] specularValues)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
@@ -77,6 +128,21 @@ namespace AKG
                 temp[2] = (byte)Math.Min(lightIntensity * ambientValues[0] + diffuseValues[0] + specularValues[0], 255);
                 temp[1] = (byte)Math.Min(lightIntensity * ambientValues[1] + diffuseValues[1] + specularValues[1], 255);
                 temp[0] = (byte)Math.Min(lightIntensity * ambientValues[2] + diffuseValues[2] + specularValues[2], 255);
+            }
+        }
+
+        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 light)
+        {
+            if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
+            {
+                byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
+
+                float lightIntensity = 1.0f;
+
+                temp[3] = 255;
+                temp[2] = (byte)Math.Min(lightIntensity * light.X, 255);
+                temp[1] = (byte)Math.Min(lightIntensity * light.Y, 255);
+                temp[0] = (byte)Math.Min(lightIntensity * light.Z, 255);
             }
         }
 
@@ -233,6 +299,7 @@ namespace AKG
                                 // Нахождение обратного вектора направления света.
                                 Vector3 lightDirection = Vector3.Normalize(pWorld - VectorTransformation.light);
                                 Vector3 viewDirection = Vector3.Normalize(pWorld - VectorTransformation.eye);
+                                Vector3 halfWayVector = Vector3.Normalize(viewDirection + lightDirection);
 
                                 // original
                                 Vector2 texture = textureA + (x - screenA.X) * textureKoeff;
@@ -267,11 +334,11 @@ namespace AKG
                                 Vector3 normal = Vector3.One;
                                 if (Model.normalMap != null)
                                 {
-                                    //System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
-                                    //normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
-                                    //normal = (normal * 2) - Vector3.One;
-                                    //normal = Vector3.Normalize(normal);
-                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
+                                    System.Drawing.Color normalColor = Model.normalMap.GetPixel(Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height));
+                                    normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
+                                    normal = (normal * 2) - Vector3.One;
+                                    normal = Vector3.Normalize(normal);
+                                    //normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
                                 }
                                 else
                                 {
@@ -291,8 +358,16 @@ namespace AKG
                                 int[] diffuseValues = DiffuseLightning(color, intensity * attenuation);
                                 int[] specularValues = SpecularLightning(specular, viewDirection, lightDirection, normal);
 
+                                if (normal.X != 0)
+                                {
+                                    normal.X = normal.X;
+                                }
+
                                 // Отрисовка.
                                 DrawPixel(bitmap, x, y, ambientValues, diffuseValues, specularValues);
+
+                                //Vector3 light = GetPhysicallyBasedRenderingLight(new(255, 255, 255), color, specular, normal, viewDirection, lightDirection, halfWayVector);
+                                //DrawPixel(bitmap, x, y, light);
                             }
                         }
                     }

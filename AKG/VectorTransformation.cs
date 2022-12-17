@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Numerics;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace AKG
 {
@@ -97,7 +95,7 @@ namespace AKG
                        }
                 );
 
-/*                if (Model.normalMap != null)
+                if (Model.normalMap != null)
                 {
                     Parallel.For(0, Model.fileNormals.GetLength(0), i =>
                         {
@@ -108,7 +106,7 @@ namespace AKG
                             );
                         }
                     );
-                }*/
+                }
 
                 Parallel.ForEach(Partitioner.Create(0, Model.listVt.Count), range =>
                     {

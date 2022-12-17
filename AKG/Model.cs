@@ -6,7 +6,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Documents;
 
 namespace AKG
 {
@@ -39,7 +38,7 @@ namespace AKG
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
                     var temp = vertices
-                        .Select(x => Regex.Replace(x.TrimEnd()/*.Replace('.', ',')*/, @"\s+", " ").Split(' '))
+                        .Select(x => Regex.Replace(x.TrimEnd().Replace('.', ','), @"\s+", " ").Split(' '))
                         .Where(x => verticesTypes.Any(x[0].Contains)).ToArray();
 
                     listV = temp
@@ -128,7 +127,7 @@ namespace AKG
                 try
                 {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
-/*                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
+                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
 
                     for (int i = 0; i < normalMap.Width; i++)
                     {
@@ -138,8 +137,9 @@ namespace AKG
                             Vector3 normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
                             normal = (normal * 2) - Vector3.One;
                             normal = Vector3.Normalize(normal);
+                            fileNormals[i, j] = normal;
                         }
-                    }*/
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -72,7 +72,7 @@ namespace AKG
         {
             float NdotH = Math.Max(Vector3.Dot(normal, halfWayVec), 0.0f);
             float numerator = (float)Math.Pow(roughness, 2.0);
-            float denominator = (float)(Math.PI * Math.Pow(Math.Pow(NdotH, 2.0) * Math.Pow(roughness, 2.0) - 1.0, 2.0));
+            float denominator = (float)(Math.PI * Math.Pow(Math.Pow(NdotH, 2.0) * (Math.Pow(roughness, 2.0) - 1.0) + 1.0, 2.0));
             denominator = (float)Math.Max(denominator, 0.000001f);
 
             return numerator / denominator;
@@ -103,7 +103,15 @@ namespace AKG
         private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec)
         {
             Vector3 f0 = new Vector3(0.04f);
-            f0 = Vector3.Lerp(new Vector3(0.04f), color, mrao.X);
+
+            if (mrao.X > 0.2 && mrao.X < 0.8)
+            { 
+                f0 = Vector3.Lerp(new Vector3(0.04f), color, mrao.X);
+            }                         
+            else if(mrao.X >= 0.8)
+            {
+                f0 = color;
+            }
 
             Vector3 ks = GetFresnelSchlickFactor(f0, view, halfWayVec);
             Vector3 kd = (Vector3.One - ks) * (1.0f - mrao.X);
@@ -361,7 +369,7 @@ namespace AKG
                                 //DrawPixel(bitmap, x, y, ambientValues + diffuseValues + specularValues);
 
                                 Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector);
-                                DrawPixel(bitmap, x, y, /*(ambientValues + diffuseValues + specularValues) +*/ shade );
+                                DrawPixel(bitmap, x, y, shade * 6.0f );
                             }
                         }
                     }

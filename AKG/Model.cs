@@ -16,8 +16,9 @@ namespace AKG
         public static List<int[]> listF2 = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector2> listVt = new List<Vector2>();
-
+        
         public static Vector3[,] fileNormals;
+        public static Vector3[,] fileNormalsOrig;
         public static Vector4[] screenVertices;
         public static Vector3[] worldVertices;
         public static Vector3[] worldNormals;
@@ -40,7 +41,7 @@ namespace AKG
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
                     var temp = vertices
-                        .Select(x => Regex.Replace(x.TrimEnd().Replace('.', ','), @"\s+", " ").Split(' '))
+                        .Select(x => Regex.Replace(x.TrimEnd()/*.Replace('.', ',')*/, @"\s+", " ").Split(' '))
                         .Where(x => verticesTypes.Any(x[0].Contains)).ToArray();
 
                     listV = temp
@@ -138,7 +139,7 @@ namespace AKG
                 try
                 {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
-                    fileNormals = new Vector3[normalMap.Width, normalMap.Height];
+                    fileNormalsOrig = new Vector3[normalMap.Width, normalMap.Height];
 
                     for (int i = 0; i < normalMap.Width; i++)
                     {
@@ -148,7 +149,7 @@ namespace AKG
                             Vector3 normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
                             normal = (normal * 2) - Vector3.One;
                             normal = Vector3.Normalize(normal);
-                            fileNormals[i, j] = normal;
+                            fileNormalsOrig[i, j] = normal;
                         }
                     }
                 }
@@ -156,25 +157,6 @@ namespace AKG
                 {
                     normalMap = null;
                 }
-
-
-
-                //foreach (string line in File.ReadLines(path))
-                //{
-                //    string[] args = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                //    if (args.Length > 0)
-                //    {
-                //        switch (args[0])
-                //        {
-                //            case "v":
-                //                listV.Add(new Vector3(float.Parse(args[1], CultureInfo.InvariantCulture), float.Parse(args[2], CultureInfo.InvariantCulture), float.Parse(args[3], CultureInfo.InvariantCulture)));
-                //                break;
-                //            default:
-                //                break;
-                //        }
-
-                //    }
-                //}
             }
             catch (IOException e)
             {

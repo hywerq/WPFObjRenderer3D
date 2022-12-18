@@ -60,6 +60,10 @@ namespace AKG
             Model.worldVertices = new Vector3[Model.listV.Count];
             Model.worldNormals = new Vector3[Model.listVn.Count];
             Model.textures = new Vector2[Model.listVt.Count];
+            if (Model.normalMap != null)
+            {
+                Model.fileNormals = new Vector3[Model.fileNormalsOrig.GetLength(0), Model.fileNormalsOrig.GetLength(1)];
+            }
 
             var Scale = Matrix4x4.CreateScale(scale);
             var Rotation = Matrix4x4.CreateFromYawPitchRoll(angleY, angleX, angleZ);
@@ -97,11 +101,11 @@ namespace AKG
 
                 if (Model.normalMap != null)
                 {
-                    Parallel.For(0, Model.fileNormals.GetLength(0), i =>
+                    Parallel.For(0, Model.fileNormalsOrig.GetLength(0), i =>
                         {
-                            Parallel.For(0, Model.fileNormals.GetLength(1), j =>
+                            Parallel.For(0, Model.fileNormalsOrig.GetLength(1), j =>
                                 {
-                                    Model.fileNormals[i, j] = Vector3.TransformNormal(Model.fileNormals[i, j], World);
+                                    Model.fileNormals[i, j] = Vector3.TransformNormal(Model.fileNormalsOrig[i, j], World);
                                 }
                             );
                         }

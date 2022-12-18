@@ -335,18 +335,17 @@ namespace AKG
                                 }
 
                                 // Нахождение нормали для точки.
-                                normal = normalA + (x - screenA.X) * normalKoeff;
-                                normal = Vector3.Normalize(normal);
-                                /*                                if (Model.normalMap != null)
-                                                                {
-                                                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
-                                                                }
-                                                                else
-                                                                {
-                                                                    normal = normalA + (x - screenA.X) * normalKoeff;
-                                                                    normal = Vector3.Normalize(normal);
-                                                                }*/                          
-                                
+                                normal = Vector3.One;
+                                if (Model.normalMap == null)
+                                {
+                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
+                                }
+                                else
+                                {
+                                    normal = normalA + (x - screenA.X) * normalKoeff;
+                                    normal = Vector3.Normalize(normal);
+                                }
+
                                 if (Model.mraoMap != null)
                                 {
                                     System.Drawing.Color spcColor = Model.mraoMap.GetPixel(Convert.ToInt32(texture.X * Model.mraoMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mraoMap.Height));
@@ -369,7 +368,7 @@ namespace AKG
                                 //DrawPixel(bitmap, x, y, ambientValues + diffuseValues + specularValues);
 
                                 Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector);
-                                DrawPixel(bitmap, x, y, shade * 6.0f );
+                                DrawPixel(bitmap, x, y, shade * 6.0f);
                             }
                         }
                     }

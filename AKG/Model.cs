@@ -31,7 +31,7 @@ namespace AKG
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 
-        public static void ReadFile(string filePath, string diffuseMapPath, string mirrorMapPath, 
+        public static void ReadFile(MainWindow mw, string filePath, string diffuseMapPath, string mirrorMapPath, 
             string normalMapPath, string mraoMapPath)
         {
             try
@@ -109,36 +109,46 @@ namespace AKG
                     var inList2ButNotInList = listF2.Except(listF).ToList();
                 }
 
+                mw.lbVert.Content = listV.Count;
+                mw.lbPoly.Content = listF.Count;
+
                 try
                 {
                     textureFile = (Bitmap)Bitmap.FromFile(diffuseMapPath);
+                    mw.lbTexture.Content = "Yes";
                 }
                 catch (Exception ex)
                 {
                     textureFile = null;
+                    mw.lbTexture.Content = "No";
                 }
 
                 try
                 {
                     mirrorMap = (Bitmap)Bitmap.FromFile(mirrorMapPath);
+                    mw.lbSpecular.Content = "Yes";
                 }
                 catch (Exception ex)
                 {
                     mirrorMap = null;
+                    mw.lbSpecular.Content = "No";
                 }
 
                 try
                 {
                     mraoMap = (Bitmap)Bitmap.FromFile(mraoMapPath);
+                    mw.lbMRAO.Content = "Yes";
                 }
                 catch (Exception ex)
                 {
                     mraoMap = null;
+                    mw.lbMRAO.Content = "No";
                 }
 
                 try
                 {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
+                    mw.lbNormal.Content = "Yes";
                     fileNormalsOrig = new Vector3[normalMap.Width, normalMap.Height];
 
                     for (int i = 0; i < normalMap.Width; i++)
@@ -148,7 +158,6 @@ namespace AKG
                             Color normalColor = normalMap.GetPixel(i, j);
                             Vector3 normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
                             normal = (normal * 2) - Vector3.One;
-                            normal = Vector3.Normalize(normal);
                             fileNormalsOrig[i, j] = normal;
                         }
                     }
@@ -156,6 +165,7 @@ namespace AKG
                 catch (Exception ex)
                 {
                     normalMap = null;
+                    mw.lbNormal.Content = "No";
                 }
             }
             catch (IOException e)

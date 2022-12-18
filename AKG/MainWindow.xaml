@@ -42,7 +42,34 @@
         <Label Content="World position:" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Name="lbPos" Content="0, 0, 0" HorizontalAlignment="Left" Margin="101,113,0,0" VerticalAlignment="Top" Foreground="White"/>
 
-        <Label Content="W, A, S, D, E, Q - for moving. I, J, K, L, U, O - for rotating. T, G - for scaling." Margin="0,10,10,0" Foreground="White" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="397"/>
+        <Label Content="Camera position:" HorizontalAlignment="Left" Margin="10,132,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Name="lbCamera" Content="0, 0, 0" HorizontalAlignment="Left" Margin="106,132,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Light position:" HorizontalAlignment="Left" Margin="10,151,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbLight" Content="0, 40, 40" HorizontalAlignment="Left" Margin="95,151,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Texture file:" HorizontalAlignment="Left" Margin="9,170,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbTexture" Content="None" HorizontalAlignment="Left" Margin="79,170,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Specular file:" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbSpecular" Content="None" HorizontalAlignment="Left" Margin="87,190,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Normal file:" HorizontalAlignment="Left" Margin="10,208,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbNormal" Content="None" HorizontalAlignment="Left" Margin="82,208,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="MRAO file:" HorizontalAlignment="Left" Margin="10,228,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbMRAO" Content="None" HorizontalAlignment="Left" Margin="79,228,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="PBR:" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbPBR" Content="None" HorizontalAlignment="Left" Margin="46,247,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Number of vertices:" HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbVert" Content="0" HorizontalAlignment="Left" Margin="127,285,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="Number of polygons:" HorizontalAlignment="Left" Margin="10,266,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="lbPoly" Content="0" HorizontalAlignment="Left" Margin="132,266,0,0" VerticalAlignment="Top" Foreground="White"/>
+
+        <Label Content="W, A, S, D, E, Q - for moving. I, J, K, L, U, O - for rotating. T, G - for scaling. Arrows for light X and Z movment, RCtrl and RShift for Y light movment. Num7, Num8, Num9, Num4, Num5, Num6 for camera movment." Foreground="White" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
 
         <GroupBox Header="Serial Port" Margin="0,0,10,10" Foreground="White" HorizontalAlignment="Right" Width="135" Height="108" VerticalAlignment="Bottom">
             <Grid HorizontalAlignment="Center" Width="123">

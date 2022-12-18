@@ -33,7 +33,7 @@ namespace AKG
                     lbRotateX.Content = angleX.ToString("#.##");
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                 }
             }
         }
@@ -49,7 +49,7 @@ namespace AKG
                     lbRotateY.Content = angleY.ToString("#.##");
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace AKG
                     lbRotateZ.Content = angleZ.ToString("#.##");
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace AKG
                     lbscale.Content = scale.ToString("#.##########");
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                 }
             }
         }
@@ -97,7 +97,8 @@ namespace AKG
                 VectorTransformation.width = (float)img.ActualWidth;
                 VectorTransformation.height = (float)img.ActualHeight;
 
-                Model.ReadFile("..\\..\\..\\objects\\" + _file + "\\Model.obj",
+                Model.ReadFile(this,
+                               "..\\..\\..\\objects\\" + _file + "\\Model.obj",
                                "..\\..\\..\\objects\\" + _file + "\\textures\\diffuse.png",
                                "..\\..\\..\\objects\\" + _file + "\\textures\\specular.png",
                                "..\\..\\..\\objects\\" + _file + "\\textures\\normal.png",
@@ -107,7 +108,7 @@ namespace AKG
                 VectorTransformation.UpdateCameraBasicVectors();
                 VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
 
-                renderer.DrawModel();
+                renderer.DrawModel(this);
 
                 StartSerialPortHandle();
             };
@@ -132,7 +133,7 @@ namespace AKG
                                 angleY = value;
 
                                 VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                                renderer.DrawModel();
+                                renderer.DrawModel(this);
                             }
                         });
 
@@ -154,7 +155,7 @@ namespace AKG
                                     VectorTransformation.light.Z - lightShiftValue;
 
                                 VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                                renderer.DrawModel();
+                                renderer.DrawModel(this);
                             }
                         });
 
@@ -194,111 +195,129 @@ namespace AKG
                     break;
                 case System.Windows.Input.Key.D:
                     movement.X += 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.A:
                     movement.X -= 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.Q:
                     movement.Y -= 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.E:
                     movement.Y += 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.W:
                     movement.Z += 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.S:
                     movement.Z -= 1;
+                    lbPos.Content = movement.X + ", " + movement.Y + ", " + movement.Z;
 
                     VectorTransformation.TransformVectors((float)_angleX, (float)_angleY, (float)_angleZ, (float)_scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad6:
                     VectorTransformation.eye.X += 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad4:
                     VectorTransformation.eye.X -= 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad7:
                     VectorTransformation.eye.Y -= 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad9:
                     VectorTransformation.eye.Y += 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad8:
                     VectorTransformation.eye.Z += 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.NumPad5:
                     VectorTransformation.eye.Z -= 1;
+                    lbCamera.Content = VectorTransformation.eye.X + ", " + VectorTransformation.eye.Y + ", " + VectorTransformation.eye.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.Up:
                     VectorTransformation.light.Z += 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.Down:
                     VectorTransformation.light.Z -= 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.Left:
                     VectorTransformation.light.X -= 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.Right:
                     VectorTransformation.light.X += 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.RightShift:
                     VectorTransformation.light.Y += 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
                 case System.Windows.Input.Key.RightCtrl:
                     VectorTransformation.light.Y -= 10;
+                    lbLight.Content = VectorTransformation.light.X + ", " + VectorTransformation.light.Y + ", " + VectorTransformation.light.Z;
 
                     VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
-                    renderer.DrawModel();
+                    renderer.DrawModel(this);
                     break;
             }
         }
@@ -311,7 +330,7 @@ namespace AKG
             VectorTransformation.UpdateViewPort();
             VectorTransformation.TransformVectors((float)angleX, (float)angleY, (float)angleZ, (float)scale, movement);
             
-            renderer.DrawModel();
+            renderer.DrawModel(this);
         }
 
         private void RotationButton_Checked(object sender, RoutedEventArgs e)

@@ -10,6 +10,8 @@ namespace AKG
     public class Renderer
     {
         private Image image;
+        
+        private MainWindow window;
 
         //private Vector3 normal, lightDirection;
 
@@ -18,7 +20,6 @@ namespace AKG
         private float specularFactor = 0.1f;
         private float glossFactor = 65f;
 
-        Vector3 normal = Vector3.One;
         Vector3 color = new Vector3(235, 163, 9);
         Vector3 specular = new Vector3(212, 21, 21);
         Vector3 mrao = new Vector3(0.91f, 0.92f, 0.92f);
@@ -100,7 +101,7 @@ namespace AKG
             return f0 + (Vector3.One - f0) * temp;
         }    
 
-        private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec)
+        private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec, Vector3 normal)
         {
             Vector3 f0 = new Vector3(0.04f);
 
@@ -149,8 +150,10 @@ namespace AKG
             }
         }
 
-        public void DrawModel()
+        public void DrawModel(MainWindow window)
         {
+            this.window = window;
+
             if (VectorTransformation.width == 0)
             {
                 VectorTransformation.width = 1;
@@ -199,7 +202,7 @@ namespace AKG
                     Vector3 vertexNormal1 = Vector3.Normalize(Model.worldNormals[vector[j + 2] - 1]);
                     Vector3 vertexNormal2 = Vector3.Normalize(Model.worldNormals[vector[j + 5] - 1]);
 
-                    // Поиск текстурной координаты по вершине
+                    // Поиск текстурной координаты по вершинам.
                     Vector2 texture0 = Model.textures[vector[1] - 1]    ;/*/ screenTriangle[0].Z;*/
                     Vector2 texture1 = Model.textures[vector[j + 1] - 1];/*/ screenTriangle[1].Z;*/
                     Vector2 texture2 = Model.textures[vector[j + 4] - 1];/*/ screenTriangle[2].Z;*/
@@ -335,17 +338,18 @@ namespace AKG
                                 }
 
                                 // Нахождение нормали для точки.
-                                normal = Vector3.One;
-                                if (Model.normalMap == null)
+                                Vector3 normal = Vector3.One;
+                                if (Model.normalMap != null)
                                 {
-                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.normalMap.Width), Convert.ToInt32((1 - texture.Y) * Model.normalMap.Height)];
+                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.fileNormals.GetLength(0)), Convert.ToInt32((1 - texture.Y) * Model.fileNormals.GetLength(1))];
                                 }
                                 else
                                 {
                                     normal = normalA + (x - screenA.X) * normalKoeff;
-                                    normal = Vector3.Normalize(normal);
                                 }
+                                normal = Vector3.Normalize(normal);
 
+                                // Мрао для точки.
                                 if (Model.mraoMap != null)
                                 {
                                     System.Drawing.Color spcColor = Model.mraoMap.GetPixel(Convert.ToInt32(texture.X * Model.mraoMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mraoMap.Height));
@@ -364,11 +368,14 @@ namespace AKG
                                 Vector3 diffuseValues = DiffuseLightning(color, intensity * attenuation);
                                 Vector3 specularValues = SpecularLightning(specular, viewDirection, lightDirection, normal);
 
-                                // Отрисовка.
+                                // Отрисовка Гуро.
                                 //DrawPixel(bitmap, x, y, ambientValues + diffuseValues + specularValues);
+                                //window.lbPBR.Content = "No";
 
-                                Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector);
+                                // Отрисовка ПБР.
+                                Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector, normal);
                                 DrawPixel(bitmap, x, y, shade * 6.0f);
+                                window.lbPBR.Content = "Yes";
                             }
                         }
                     }

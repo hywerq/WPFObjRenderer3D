@@ -69,6 +69,34 @@ namespace AKG
             return values;
         }
 
+        private Vector3 AcesFilmic(Vector3 color)
+        {
+            color = new(Vector3.Dot(new(0.59719f, 0.35458f, 0.04823f), color),
+                        Vector3.Dot(new(0.07600f, 0.90834f, 0.01566f), color),
+                        Vector3.Dot(new(0.02840f, 0.13384f, 0.83777f), color));
+
+            color = (color * (color + 0.0245786f * Vector3.One) - 0.000090537f * Vector3.One) /
+                    (color * (0.983729f * color + 0.4329510f * Vector3.One) + 0.238081f * Vector3.One);
+
+            color = new(Vector3.Dot(new(1.60475f, -0.53108f, -0.07367f), color),
+                        Vector3.Dot(new(-0.10208f, 1.10813f, -0.00605f), color),
+                        Vector3.Dot(new(-0.00327f, -0.07276f, 1.07602f), color));
+
+            return Vector3.Clamp(color, Vector3.Zero, Vector3.One);
+        }
+
+        private Vector3 SrgbToLinear(Vector3 color)
+        {
+            float SrgbToLinear(float c) => (float)(c <= 0.04045f ? c / 12.92f : Math.Pow((c + 0.055f) / 1.055f, 2.4f));
+            return new(SrgbToLinear(color.X), SrgbToLinear(color.Y), SrgbToLinear(color.Z));
+        }
+
+        private Vector3 LinearToSrgb(Vector3 color)
+        {
+            float LinearToSrgb(float c) => (float)(c <= 0.0031308f ? 12.92f * c : 1.055f * Math.Pow(c, 1 / 2.4f) - 0.055f);
+            return new(LinearToSrgb(color.X), LinearToSrgb(color.Y), LinearToSrgb(color.Z));
+        }
+
         private float ThrowbridgeReitzNormalDistribution(float roughness, Vector3 normal, Vector3 halfWayVec)
         {
             float NdotH = Math.Max(Vector3.Dot(normal, halfWayVec), 0.0f);

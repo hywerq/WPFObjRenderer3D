@@ -138,10 +138,14 @@ namespace AKG
         {
             Vector3 f0 = color;
 
-            if (mrao.X < 0.85)
+            if (mrao.X < 0.5 && mrao.X > 0.15)
             { 
                 f0 = Vector3.Lerp(new Vector3(0.04f), color, mrao.X);
-            }           
+            }      
+            else if (mrao.X <= 0.15)
+            {
+                f0 = new Vector3(0.04f);
+            }
 
             Vector3 ks = GetFresnelSchlickFactor(f0, view, halfWayVec);
             Vector3 kd = (Vector3.One - ks) * (1.0f - mrao.X);

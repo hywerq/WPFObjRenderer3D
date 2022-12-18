@@ -100,7 +100,8 @@ namespace AKG
                 Model.ReadFile("..\\..\\..\\objects\\" + _file + "\\Model.obj",
                                "..\\..\\..\\objects\\" + _file + "\\textures\\diffuse.png",
                                "..\\..\\..\\objects\\" + _file + "\\textures\\specular.png",
-                               "..\\..\\..\\objects\\" + _file + "\\textures\\normal.png");
+                               "..\\..\\..\\objects\\" + _file + "\\textures\\normal.png",
+                               "..\\..\\..\\objects\\" + _file + "\\textures\\mrao.png");
 
                 VectorTransformation.UpdateViewPort();
                 VectorTransformation.UpdateCameraBasicVectors();

@@ -26,10 +26,12 @@ namespace AKG
         public static Bitmap textureFile;
         public static Bitmap mirrorMap;
         public static Bitmap normalMap;
+        public static Bitmap mraoMap;
 
         private static string[] verticesTypes = { "v", "vt", "vn", "f"};
 
-        public static void ReadFile(string filePath, string diffuseMapPath, string mirrorMapPath, string normalMapPath)
+        public static void ReadFile(string filePath, string diffuseMapPath, string mirrorMapPath, 
+            string normalMapPath, string mraoMapPath)
         {
             try
             {
@@ -122,6 +124,15 @@ namespace AKG
                 catch (Exception ex)
                 {
                     mirrorMap = null;
+                }
+
+                try
+                {
+                    mraoMap = (Bitmap)Bitmap.FromFile(mraoMapPath);
+                }
+                catch (Exception ex)
+                {
+                    mraoMap = null;
                 }
 
                 try

@@ -13,12 +13,17 @@ namespace AKG
         
         private MainWindow window;
 
-        //private Vector3 normal, lightDirection;
-
         private float ambientFactor = 1.0f;
         private float diffuseFactor = 1.0f; 
         private float specularFactor = 0.1f;
-        private float glossFactor = 65f;
+        private float glossFactor = 25f;
+        private float lightIntensity = 2f;
+
+        public float LightIntensity 
+        { 
+            get { return lightIntensity; } 
+            set { lightIntensity = value; }
+        }
 
         Vector3 color = new Vector3(235, 163, 9);
         Vector3 specular = new Vector3(212, 21, 21);
@@ -131,16 +136,12 @@ namespace AKG
 
         private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec, Vector3 normal)
         {
-            Vector3 f0 = new Vector3(0.04f);
+            Vector3 f0 = color;
 
-            if (mrao.X > 0.2 && mrao.X < 0.8)
+            if (mrao.X < 0.85)
             { 
                 f0 = Vector3.Lerp(new Vector3(0.04f), color, mrao.X);
-            }                         
-            else if(mrao.X >= 0.8)
-            {
-                f0 = color;
-            }
+            }           
 
             Vector3 ks = GetFresnelSchlickFactor(f0, view, halfWayVec);
             Vector3 kd = (Vector3.One - ks) * (1.0f - mrao.X);
@@ -161,15 +162,19 @@ namespace AKG
             return result;
         }
          
-        private unsafe void DrawPixel(WriteableBitmap bitmap, int x, int y, Vector3 light)
+        private void DrawPixelLDR(WriteableBitmap bitmap, int x, int y, Vector3 light)
+        {
+            //light *= 255f;
+            light = LinearToSrgb(AcesFilmic(light)) * 255f;
+
+            DrawPixelHDR(bitmap, x, y, light);
+        }
+
+        private unsafe void DrawPixelHDR(WriteableBitmap bitmap, int x, int y, Vector3 light)
         {
             if (x > 0 && y > 0 && x < VectorTransformation.width && y < VectorTransformation.height)
             {
                 byte* temp = (byte*)bitmap.BackBuffer + y * bitmap.BackBufferStride + x * bitmap.Format.BitsPerPixel / 8;
-
-                float lightIntensity = 0.8f;
-
-                light *= 255f;
 
                 temp[3] = 255;
                 temp[2] = (byte)Math.Min(lightIntensity * light.X, 255);
@@ -402,7 +407,7 @@ namespace AKG
 
                                 // Отрисовка ПБР.
                                 Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector, normal);
-                                DrawPixel(bitmap, x, y, shade * 6.0f);
+                                DrawPixelLDR(bitmap, x, y, shade);
                                 window.lbPBR.Content = "Yes";
                             }
                         }

@@ -77,5 +77,10 @@
                 <RadioButton Content="Lightning" Margin="0,45,0,17" Height="23" HorizontalAlignment="Center" Width="87" Foreground="White" Checked="LightningButton_Checked"/>
             </Grid>
         </GroupBox>
+        <GroupBox Header="Light intensity" Margin="0,0,10,123" Foreground="White" HorizontalAlignment="Right" Width="135" Height="61" VerticalAlignment="Bottom">
+            <Grid HorizontalAlignment="Center" Width="123">
+                <Slider x:Name="slider" Width="106" Height="18" Minimum="1" Maximum="5" TickPlacement="TopLeft" IsSnapToTickEnabled="True" Value="2" SmallChange="0" ValueChanged="Slider_ValueChanged" TickFrequency="0.5"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>

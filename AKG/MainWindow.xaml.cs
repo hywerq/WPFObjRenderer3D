@@ -342,5 +342,14 @@ namespace AKG
         {
             SerialPortHandler.SendCommand("L");
         }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (IsLoaded)
+            {
+                renderer.LightIntensity = (float)slider.Value;
+                renderer.DrawModel(this);
+            }
+        }
     }
 }

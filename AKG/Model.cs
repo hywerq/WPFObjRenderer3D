@@ -16,7 +16,7 @@ namespace AKG
         public static List<int[]> listF2 = new List<int[]>();
         public static List<Vector3> listVn = new List<Vector3>();
         public static List<Vector2> listVt = new List<Vector2>();
-        
+
         public static Vector3[,] fileNormals;
         public static Vector3[,] fileNormalsOrig;
         public static Vector4[] screenVertices;
@@ -28,11 +28,12 @@ namespace AKG
         public static Bitmap mirrorMap;
         public static Bitmap normalMap;
         public static Bitmap mraoMap;
+        public static Bitmap emissionMap;
 
-        private static string[] verticesTypes = { "v", "vt", "vn", "f"};
+        private static string[] verticesTypes = { "v", "vt", "vn", "f" };
 
-        public static void ReadFile(MainWindow mw, string filePath, string diffuseMapPath, string mirrorMapPath, 
-            string normalMapPath, string mraoMapPath)
+        public static void ReadFile(MainWindow mw, string filePath, string diffuseMapPath, string mirrorMapPath,
+            string normalMapPath, string mraoMapPath, string emissionMapPath)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace AKG
                     var vertices = sr.ReadToEnd().Split('\n').ToList();
 
                     var temp = vertices
-                        .Select(x => Regex.Replace(x.TrimEnd()/*.Replace('.', ',')*/, @"\s+", " ").Split(' '))
+                        .Select(x => Regex.Replace(x.TrimEnd().Replace('.', ','), @"\s+", " ").Split(' '))
                         .Where(x => verticesTypes.Any(x[0].Contains)).ToArray();
 
                     listV = temp
@@ -147,13 +148,22 @@ namespace AKG
 
                 try
                 {
+                    emissionMap = (Bitmap)Bitmap.FromFile(emissionMapPath);
+                }
+                catch (Exception ex)
+                {
+                    emissionMap = null;
+                }
+
+                try
+                {
                     normalMap = (Bitmap)Bitmap.FromFile(normalMapPath);
                     mw.lbNormal.Content = "Yes";
                     fileNormalsOrig = new Vector3[normalMap.Width, normalMap.Height];
 
-                    for (int i = 0; i < normalMap.Width; i++)
+                    for (int i = 0; i < normalMap.Width - 1; i++)
                     {
-                        for (int j = 0; j < normalMap.Height; j++)
+                        for (int j = 0; j < normalMap.Height - 1; j++)
                         {
                             Color normalColor = normalMap.GetPixel(i, j);
                             Vector3 normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);

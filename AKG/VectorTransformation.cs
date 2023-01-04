@@ -11,11 +11,12 @@ namespace AKG
         public static Vector3 YAxis = new Vector3(1.0f, 1.0f, 1.0f);
         public static Vector3 ZAxis = new Vector3(1.0f, 1.0f, 1.0f);
 
-        public static Vector3 eye = new Vector3(0.0f, 0.0f, 40.0f);
+        public static Vector3 eye = new Vector3(0.0f, 0.0f, 10.0f);
         public static Vector3 target = new Vector3(0.0f, 0.0f, 0.0f);
         public static Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 
-        public static Vector3 light = new Vector3(0f, 40f, 40f);
+        public static Vector3[] light = { new Vector3(0f, 0f, 15f), new Vector3(10f, 0f, 15f), new Vector3(-10f, 0f, 15f), new Vector3(20f, 0f, 15f) };
+        public static Vector3[] lightColor = { new Vector3(1f, 1f, 1f), new Vector3(1f, 0f, 0f), new Vector3(0f, 1f, 0f), new Vector3(0f, 0f, 1f) };
 
         public static float width = 1;
         public static float height = 1;
@@ -79,46 +80,48 @@ namespace AKG
             if (Model.listV.Count > 0)
             {
                 Parallel.ForEach(Partitioner.Create(0, Model.listV.Count), range =>
-                       {
-                           for (int i = range.Item1; i < range.Item2; i++)
-                           {
-                               Model.worldVertices[i] = Vector3.Transform(Model.listV[i], World);
-                               Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
-                               Model.screenVertices[i] /= Model.screenVertices[i].W;
-                               Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
-                           }
-                       }
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
+                    {
+                        Model.worldVertices[i] = Vector3.Transform(Model.listV[i], World);
+                        Model.screenVertices[i] = Vector4.Transform(Model.listV[i], Projection_View_Model);
+                        float recW = 1 / Model.screenVertices[i].W;
+                        Model.screenVertices[i] /= Model.screenVertices[i].W;
+                        Model.screenVertices[i] = Vector4.Transform(Model.screenVertices[i], Viewport);
+                        Model.screenVertices[i].W = recW;
+                    }
+                }
                 );
 
                 Parallel.ForEach(Partitioner.Create(0, Model.listVn.Count), range =>
-                       {
-                           for (int i = range.Item1; i < range.Item2; i++)
-                           {
-                               Model.worldNormals[i] = Vector3.TransformNormal(Model.listVn[i], World);
-                           }
-                       }
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
+                    {
+                        Model.worldNormals[i] = Vector3.TransformNormal(Model.listVn[i], World);
+                    }
+                }
                 );
 
                 if (Model.normalMap != null)
                 {
                     Parallel.For(0, Model.fileNormalsOrig.GetLength(0), i =>
+                    {
+                        Parallel.For(0, Model.fileNormalsOrig.GetLength(1), j =>
                         {
-                            Parallel.For(0, Model.fileNormalsOrig.GetLength(1), j =>
-                                {
-                                    Model.fileNormals[i, j] = Vector3.TransformNormal(Model.fileNormalsOrig[i, j], World);
-                                }
-                            );
+                            Model.fileNormals[i, j] = Vector3.TransformNormal(Model.fileNormalsOrig[i, j], World);
                         }
+                        );
+                    }
                     );
                 }
 
                 Parallel.ForEach(Partitioner.Create(0, Model.listVt.Count), range =>
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
                     {
-                        for (int i = range.Item1; i < range.Item2; i++)
-                        {
-                            Model.textures[i] = Model.listVt[i];
-                        }
+                        Model.textures[i] = Model.listVt[i];
                     }
+                }
                 );
             }
         }

@@ -10,18 +10,19 @@ namespace AKG
     public class Renderer
     {
         private Image image;
-        
+
         private MainWindow window;
 
         private float ambientFactor = 1.0f;
-        private float diffuseFactor = 1.0f; 
-        private float specularFactor = 0.1f;
+        private float diffuseFactor = 1.0f;
+        private float specularFactor = 3f;
         private float glossFactor = 25f;
-        private float lightIntensity = 2f;
+        private float lightIntensity = 50f;
+        private bool PBRMode = true;
 
-        public float LightIntensity 
-        { 
-            get { return lightIntensity; } 
+        public float LightIntensity
+        {
+            get { return lightIntensity; }
             set { lightIntensity = value; }
         }
 
@@ -58,7 +59,7 @@ namespace AKG
             return values;
         }
 
-        private Vector3 SpecularLightning(Vector3 specularColor, Vector3 View, Vector3 lightDirection, Vector3 normal)
+        private Vector3 SpecularLightning(Vector3 specularColor, Vector3 View, Vector3 lightDirection, Vector3 normal, float intensity)
         {
             Vector3 reflection = Vector3.Normalize(Vector3.Reflect(lightDirection, normal));
             float RV = Math.Max(Vector3.Dot(reflection, -View), 0);
@@ -66,9 +67,9 @@ namespace AKG
             double temp = Math.Pow(RV, glossFactor);
             Vector3 values = new Vector3
             {
-                X = (float)(specularFactor * temp * specularColor.X),
-                Y = (float)(specularFactor * temp * specularColor.Y),
-                Z = (float)(specularFactor * temp * specularColor.Z)
+                X = (float)(specularFactor * temp * specularColor.X * intensity),
+                Y = (float)(specularFactor * temp * specularColor.Y * intensity),
+                Z = (float)(specularFactor * temp * specularColor.Z * intensity)
             };
 
             return values;
@@ -104,20 +105,20 @@ namespace AKG
 
         private float ThrowbridgeReitzNormalDistribution(float roughness, Vector3 normal, Vector3 halfWayVec)
         {
-            float NdotH = Math.Max(Vector3.Dot(normal, halfWayVec), 0.0f);
-            float numerator = (float)Math.Pow(roughness, 2.0);
-            float denominator = (float)(Math.PI * Math.Pow(Math.Pow(NdotH, 2.0) * (Math.Pow(roughness, 2.0) - 1.0) + 1.0, 2.0));
-            denominator = (float)Math.Max(denominator, 0.000001f);
+            float NdotH = MathF.Max(Vector3.Dot(normal, halfWayVec), 1e-4f);
+            float numerator = MathF.Pow(roughness, 4);
+            float denominator = MathF.PI * MathF.Pow(MathF.Pow(NdotH, 2) * (MathF.Pow(roughness, 4) - 1) + 1, 2);
+            denominator = MathF.Max(denominator, 1e-4f);
 
             return numerator / denominator;
         }
 
         private float GetSchlickBeckmannFactor(float roughness, Vector3 normal, Vector3 x /* V or L */)
         {
-            float k = roughness / 2.0f;
-            float numerator = (float)Math.Max(Vector3.Dot(normal, x), 0.0);
-            float denominator = (float)Math.Max(Vector3.Dot(normal, x), 0.0) * (1.0f - k) + k;
-            denominator = (float)Math.Max(denominator, 0.000001f);
+            float k = MathF.Pow(roughness, 2) / 2.0f;
+            float numerator = MathF.Max(Vector3.Dot(normal, -x), 1e-4f);
+            float denominator = MathF.Max(Vector3.Dot(normal, -x), 1e-4f) * (1.0f - k) + k;
+            denominator = MathF.Max(denominator, 1e-4f);
 
             return numerator / denominator;
         }
@@ -129,19 +130,19 @@ namespace AKG
 
         private Vector3 GetFresnelSchlickFactor(Vector3 f0, Vector3 view, Vector3 halfWayVec)
         {
-            Vector3 temp = new((float)Math.Pow(1 - Math.Max(Vector3.Dot(halfWayVec, view), 0.0), 5.0));
+            float temp = MathF.Pow(1 - Math.Max(Vector3.Dot(halfWayVec, -view), 1e-4f), 5);
 
             return f0 + (Vector3.One - f0) * temp;
-        }    
+        }
 
-        private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec, Vector3 normal)
+        private Vector3 GetPhysicallyBasedRenderingLight(Vector3 lightColor, Vector3 view, Vector3 light, Vector3 halfWayVec, Vector3 normal, float attenuation)
         {
             Vector3 f0 = color;
 
             if (mrao.X < 0.5 && mrao.X > 0.15)
-            { 
+            {
                 f0 = Vector3.Lerp(new Vector3(0.04f), color, mrao.X);
-            }      
+            }
             else if (mrao.X <= 0.15)
             {
                 f0 = new Vector3(0.04f);
@@ -150,26 +151,31 @@ namespace AKG
             Vector3 ks = GetFresnelSchlickFactor(f0, view, halfWayVec);
             Vector3 kd = (Vector3.One - ks) * (1.0f - mrao.X);
 
-            Vector3 lambert = color / (float)Math.PI;
+            Vector3 lambert = color / MathF.PI;
 
             Vector3 cookTorranceNumerator = ThrowbridgeReitzNormalDistribution(mrao.Y, normal, halfWayVec)
                 * GetSmithFactor(mrao.Y, normal, view, light) * ks;
-            float cookTorranceDenominator = 4.0f * (float)Math.Max(Vector3.Dot(view, normal), 0.0) 
-                * (float)Math.Max(Vector3.Dot(light, normal), 0.0);
-            cookTorranceDenominator = (float)Math.Max(cookTorranceDenominator, 0.000001f);
+            float cookTorranceDenominator = 4.0f * MathF.Max(Vector3.Dot(-view, normal), 1e-4f)
+                * MathF.Max(Vector3.Dot(-light, normal), 1e-4f);
 
             Vector3 cookTorrance = cookTorranceNumerator / cookTorranceDenominator;
             Vector3 brdf = kd * lambert + cookTorrance;
 
-            Vector3 result = brdf * lightColor * (float)Math.Max(Vector3.Dot(light, normal), 0.0);
+            Vector3 result = brdf * lightColor * MathF.Max(Vector3.Dot(-light, normal), 1e-4f) * attenuation;
 
             return result;
         }
-         
+
         private void DrawPixelLDR(WriteableBitmap bitmap, int x, int y, Vector3 light)
         {
-            //light *= 255f;
-            light = LinearToSrgb(AcesFilmic(light)) * 255f;
+            if (!PBRMode)
+            {
+                light *= 255f;
+            }
+            else
+            {
+                light = LinearToSrgb(AcesFilmic(light)) * 255f;
+            }
 
             DrawPixelHDR(bitmap, x, y, light);
         }
@@ -211,11 +217,19 @@ namespace AKG
             image.Source = bitmap;
         }
 
+        private Vector3 Sum(Vector3[] vectors)
+        {
+            Vector3 buf = Vector3.Zero;
+            for (int i = 0; i < vectors.Length; i++)
+            {
+                buf += vectors[i];
+            }
+            return buf;
+        }
+
         private void Rasterization(WriteableBitmap bitmap)
         {
             float?[,] z_buff = new float?[bitmap.PixelHeight, bitmap.PixelWidth];
-
-            //FindNormals();
 
             foreach (int[] vector in Model.listF)
             {
@@ -234,15 +248,19 @@ namespace AKG
                         continue;
                     }
 
+                    worldTriangle[0] *= screenTriangle[0].W;
+                    worldTriangle[1] *= screenTriangle[1].W;
+                    worldTriangle[2] *= screenTriangle[2].W;
+
                     // Поиск нормали по вершинам.
-                    Vector3 vertexNormal0 = Vector3.Normalize(Model.worldNormals[vector[2] - 1]);
-                    Vector3 vertexNormal1 = Vector3.Normalize(Model.worldNormals[vector[j + 2] - 1]);
-                    Vector3 vertexNormal2 = Vector3.Normalize(Model.worldNormals[vector[j + 5] - 1]);
+                    Vector3 vertexNormal0 = Vector3.Normalize(Model.worldNormals[vector[2] - 1]) * screenTriangle[0].W;
+                    Vector3 vertexNormal1 = Vector3.Normalize(Model.worldNormals[vector[j + 2] - 1]) * screenTriangle[1].W;
+                    Vector3 vertexNormal2 = Vector3.Normalize(Model.worldNormals[vector[j + 5] - 1]) * screenTriangle[2].W;
 
                     // Поиск текстурной координаты по вершинам.
-                    Vector2 texture0 = Model.textures[vector[1] - 1]    ;/*/ screenTriangle[0].Z;*/
-                    Vector2 texture1 = Model.textures[vector[j + 1] - 1];/*/ screenTriangle[1].Z;*/
-                    Vector2 texture2 = Model.textures[vector[j + 4] - 1];/*/ screenTriangle[2].Z;*/
+                    Vector2 texture0 = Model.textures[vector[1] - 1] * screenTriangle[0].W;
+                    Vector2 texture1 = Model.textures[vector[j + 1] - 1] * screenTriangle[1].W;
+                    Vector2 texture2 = Model.textures[vector[j + 4] - 1] * screenTriangle[2].W;
 
                     // Сортировка вершин треугольников в порядке "вверх-лево-право(низ)".
                     if (screenTriangle[0].Y > screenTriangle[1].Y)
@@ -268,20 +286,20 @@ namespace AKG
                     }
 
                     // Нахождение коэффицентов в экранных и мировых координатах, коэффицента для нормалей, текстур.
-                    Vector4 screenKoeff01       = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector3 worldKoeff01        = (worldTriangle[1] - worldTriangle[0])   / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector3 vertexNormalKoeff01 = (vertexNormal1 - vertexNormal0)         / (screenTriangle[1].Y - screenTriangle[0].Y);
-                    Vector2 textureKoeff01      = (texture1 - texture0)                   / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector4 screenKoeff01 = (screenTriangle[1] - screenTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff01 = (worldTriangle[1] - worldTriangle[0]) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector3 vertexNormalKoeff01 = (vertexNormal1 - vertexNormal0) / (screenTriangle[1].Y - screenTriangle[0].Y);
+                    Vector2 textureKoeff01 = (texture1 - texture0) / (screenTriangle[1].Y - screenTriangle[0].Y);
 
-                    Vector4 screenKoeff02       = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector3 worldKoeff02        = (worldTriangle[2] - worldTriangle[0])   / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector3 vertexNormalKoeff02 = (vertexNormal2 - vertexNormal0)         / (screenTriangle[2].Y - screenTriangle[0].Y);
-                    Vector2 textureKoeff02      = (texture2 - texture0)                   / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector4 screenKoeff02 = (screenTriangle[2] - screenTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector3 worldKoeff02 = (worldTriangle[2] - worldTriangle[0]) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector3 vertexNormalKoeff02 = (vertexNormal2 - vertexNormal0) / (screenTriangle[2].Y - screenTriangle[0].Y);
+                    Vector2 textureKoeff02 = (texture2 - texture0) / (screenTriangle[2].Y - screenTriangle[0].Y);
 
-                    Vector4 screenKoeff03       = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector3 worldKoeff03        = (worldTriangle[2] - worldTriangle[1])   / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector3 vertexNormalKoeff03 = (vertexNormal2 - vertexNormal1)         / (screenTriangle[2].Y - screenTriangle[1].Y);
-                    Vector2 textureKoeff03      = (texture2 - texture1)                   / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector4 screenKoeff03 = (screenTriangle[2] - screenTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector3 worldKoeff03 = (worldTriangle[2] - worldTriangle[1]) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector3 vertexNormalKoeff03 = (vertexNormal2 - vertexNormal1) / (screenTriangle[2].Y - screenTriangle[1].Y);
+                    Vector2 textureKoeff03 = (texture2 - texture1) / (screenTriangle[2].Y - screenTriangle[1].Y);
 
                     // Нахождение минимального и максимального Y для треугольника на экране и последующей итерации.
                     int minY = Math.Max((int)MathF.Ceiling(screenTriangle[0].Y), 0);
@@ -291,7 +309,7 @@ namespace AKG
                     {
                         // Нахождение левого и правого значения Y.
                         Vector4 screenA = y < screenTriangle[1].Y ? screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff01 :
-                                                                    screenTriangle[1] + (y - screenTriangle[1].Y) * screenKoeff03; 
+                                                                    screenTriangle[1] + (y - screenTriangle[1].Y) * screenKoeff03;
                         Vector4 screenB = screenTriangle[0] + (y - screenTriangle[0].Y) * screenKoeff02;
 
                         Vector3 worldA = y < screenTriangle[1].Y ? worldTriangle[0] + (y - screenTriangle[0].Y) * worldKoeff01 :
@@ -311,9 +329,9 @@ namespace AKG
                         // Сортировка значений в порядке "лево-право".
                         if (screenA.X > screenB.X)
                         {
-                            (screenA, screenB)   = (screenB, screenA);
-                            (worldA , worldB)    = (worldB , worldA);
-                            (normalA, normalB)   = (normalB, normalA);
+                            (screenA, screenB) = (screenB, screenA);
+                            (worldA, worldB) = (worldB, worldA);
+                            (normalA, normalB) = (normalB, normalA);
                             (textureA, textureB) = (textureB, textureA);
                         }
 
@@ -322,55 +340,41 @@ namespace AKG
                         int maxX = Math.Min((int)MathF.Ceiling(screenB.X), bitmap.PixelWidth);
 
                         // Нахождение коэффицентов изменения X в экранных и мировых координатах, коэффицента изменения нормали.
-                        Vector4 screenKoeff  = (screenB - screenA)   / (screenB.X - screenA.X);
-                        Vector3 worldKoeff   = (worldB - worldA)     / (screenB.X - screenA.X);
-                        Vector3 normalKoeff  = (normalB - normalA)   / (screenB.X - screenA.X);
+                        Vector4 screenKoeff = (screenB - screenA) / (screenB.X - screenA.X);
+                        Vector3 worldKoeff = (worldB - worldA) / (screenB.X - screenA.X);
+                        Vector3 normalKoeff = (normalB - normalA) / (screenB.X - screenA.X);
                         Vector2 textureKoeff = (textureB - textureA) / (screenB.X - screenA.X);
 
                         // Сканирующая линия.
                         for (int x = minX; x < maxX; x++)
                         {
-                            // Нахождение координат точки в экранных и мировых координатах.
+                            // Нахождение координат точки в экранных координатах.
                             Vector4 pScreen = screenA + (x - screenA.X) * screenKoeff;
-                            Vector3 pWorld = worldA + (x - screenA.X) * worldKoeff;
 
                             // Z-буффер.
                             if (!(pScreen.Z > z_buff[y, x]))
                             {
                                 z_buff[y, x] = pScreen.Z;
 
-                                // Нахождение обратного вектора направления света.
-                                Vector3 lightDirection = Vector3.Normalize(pWorld - VectorTransformation.light);
+                                Vector3 pWorld = (worldA + (x - screenA.X) * worldKoeff) / pScreen.W;
+
+                                // Нахождение направления взгляда.
                                 Vector3 viewDirection = Vector3.Normalize(pWorld - VectorTransformation.eye);
+                                //Vector3 view = Vector3.Normalize(VectorTransformation.eye - pWorld);
 
-                                Vector3 view = Vector3.Normalize(VectorTransformation.eye - pWorld);
-                                Vector3 light = Vector3.Normalize(VectorTransformation.light - pWorld);
-                                Vector3 halfWayVector = Vector3.Normalize(view + light);
-
-                                // original
-                                Vector2 texture = textureA + (x - screenA.X) * textureKoeff;
-                                //texture /= Vector2.One / pScreen.Z;
-
-                                // affine
-                                //Vector2 texture = (Vector2.One - textureKoeff) * textureA + textureKoeff * textureB;
-
-                                // perspective
-                                /*Vector2 texture = ((Vector2.One - textureKoeff) * (textureA / screenA.Z) +
-                                                    textureKoeff * (textureB / screenB.Z)) /
-                                                  ((Vector2.One - textureKoeff) * (1 / screenA.Z) +
-                                                    textureKoeff * (1 / screenB.Z));*/
+                                Vector2 texture = (textureA + (x - screenA.X) * textureKoeff) / pScreen.W;
 
                                 // Цвет объекта.
                                 if (Model.textureFile != null)
                                 {
-                                    System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * Model.textureFile.Width), Convert.ToInt32((1 - texture.Y) * Model.textureFile.Height));
-                                    color = new Vector3(objColor.R, objColor.G, objColor.B) / 255f;
+                                    System.Drawing.Color objColor = Model.textureFile.GetPixel(Convert.ToInt32(texture.X * (Model.textureFile.Width - 1)), Convert.ToInt32((1 - texture.Y) * (Model.textureFile.Height - 1)));
+                                    color = SrgbToLinear(new Vector3(objColor.R, objColor.G, objColor.B) / 255f);
                                 }
 
                                 // Цвет отражения.
                                 if (Model.mirrorMap != null)
                                 {
-                                    System.Drawing.Color spcColor = Model.mirrorMap.GetPixel(Convert.ToInt32(texture.X * Model.mirrorMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mirrorMap.Height));
+                                    System.Drawing.Color spcColor = Model.mirrorMap.GetPixel(Convert.ToInt32(texture.X * (Model.mirrorMap.Width - 1)), Convert.ToInt32((1 - texture.Y) * (Model.mirrorMap.Height - 1)));
                                     specular = new Vector3(spcColor.R, spcColor.G, spcColor.B) / 255f;
                                 }
 
@@ -378,41 +382,73 @@ namespace AKG
                                 Vector3 normal = Vector3.One;
                                 if (Model.normalMap != null)
                                 {
-                                    normal = Model.fileNormals[Convert.ToInt32(texture.X * Model.fileNormals.GetLength(0)), Convert.ToInt32((1 - texture.Y) * Model.fileNormals.GetLength(1))];
+                                    var buf1 = Convert.ToInt32(texture.X * (Model.fileNormals.GetLength(0) - 1));
+                                    var buf2 = Convert.ToInt32((1 - texture.Y) * (Model.fileNormals.GetLength(1) - 1));
+                                    normal = Model.fileNormals[buf1, buf2];
                                 }
                                 else
                                 {
-                                    normal = normalA + (x - screenA.X) * normalKoeff;
+                                    normal = (normalA + (x - screenA.X) * normalKoeff) / pScreen.W;
                                 }
                                 normal = Vector3.Normalize(normal);
 
                                 // Мрао для точки.
                                 if (Model.mraoMap != null)
                                 {
-                                    System.Drawing.Color spcColor = Model.mraoMap.GetPixel(Convert.ToInt32(texture.X * Model.mraoMap.Width), Convert.ToInt32((1 - texture.Y) * Model.mraoMap.Height));
+                                    System.Drawing.Color spcColor = Model.mraoMap.GetPixel(Convert.ToInt32(texture.X * (Model.mraoMap.Width - 1)), Convert.ToInt32((1 - texture.Y) * (Model.mraoMap.Height - 1)));
                                     mrao = new Vector3(spcColor.R, spcColor.G, spcColor.B) / 255f;
                                 }
 
-                                // Нахождение дистанции до источника света.
-                                float distance = lightDirection.LengthSquared();
-                                // Затенение объекта в зависимости от дистанции света до модели.
-                                float attenuation = 1 / Math.Max(distance, 0.01f);
-                                // Получение затененности каждой точки.
-                                float intensity = Math.Max(Vector3.Dot(normal, -lightDirection), 0);
+                                Vector3 emission = Vector3.Zero;
+                                if (Model.emissionMap != null)
+                                {
+                                    System.Drawing.Color emColor = Model.emissionMap.GetPixel(Convert.ToInt32(texture.X * (Model.emissionMap.Width - 1)), Convert.ToInt32((1 - texture.Y) * (Model.emissionMap.Height - 1)));
+                                    emission = SrgbToLinear(new Vector3(emColor.R, emColor.G, emColor.B) / 255f);
+                                }
 
-                                // Освещение Фонга.
+                                Vector3[] diffuseValues = new Vector3[VectorTransformation.light.Length];
+                                Vector3[] specularValues = new Vector3[VectorTransformation.light.Length];
+
+                                Vector3 ambient = 0.05f * color * mrao.Z;
+                                Vector3 shadeValue = ambient + emission * 5;
+
+                                for (int i = 0; i < VectorTransformation.light.Length; i++)
+                                {
+                                    // Нахождение медианного вектора, направления света и самого вектора света.
+                                    float distance = Vector3.Distance(pWorld, VectorTransformation.light[i]);
+                                    Vector3 lightDirection = (pWorld - VectorTransformation.light[i]) / distance;
+                                    //Vector3 light = Vector3.Normalize(VectorTransformation.light[i] - pWorld);
+                                    Vector3 halfWayVector = -Vector3.Normalize(viewDirection + lightDirection);
+
+                                    //// Нахождение дистанции до источника света.
+                                    //float distance = lightDirection.LengthSquared();
+                                    //// Затенение объекта в зависимости от дистанции света до модели.
+                                    float attenuation = 1 / Math.Max(distance, 1e-4f);
+                                    //// Получение затененности каждой точки.
+                                    //float intensity = Math.Max(Vector3.Dot(normal, -lightDirection), 0);
+
+                                    //// Освещение Фонга.
+                                    //diffuseValues[i] = DiffuseLightning(color, intensity * attenuation);
+                                    //specularValues[i] = SpecularLightning(specular, viewDirection, Vector3.Normalize(lightDirection), normal, intensity * attenuation);
+
+                                    // PBR.
+                                    shadeValue += GetPhysicallyBasedRenderingLight(VectorTransformation.lightColor[i], viewDirection, lightDirection, halfWayVector, normal, attenuation);
+                                }
+
                                 Vector3 ambientValues = AmbientLightning(color);
-                                Vector3 diffuseValues = DiffuseLightning(color, intensity * attenuation);
-                                Vector3 specularValues = SpecularLightning(specular, viewDirection, lightDirection, normal);
 
-                                // Отрисовка Гуро.
-                                //DrawPixel(bitmap, x, y, ambientValues + diffuseValues + specularValues);
-                                //window.lbPBR.Content = "No";
-
-                                // Отрисовка ПБР.
-                                Vector3 shade = GetPhysicallyBasedRenderingLight(new(1.0f, 1.0f, 1.0f), view, light, halfWayVector, normal);
-                                DrawPixelLDR(bitmap, x, y, shade);
-                                window.lbPBR.Content = "Yes";
+                                if (!PBRMode)
+                                {
+                                    // Отрисовка Гуро.
+                                    //DrawPixelLDR(bitmap, x, y, ambientValues + Sum(diffuseValues) + Sum(specularValues));
+                                    //window.lbPBR.Content = "No";
+                                }
+                                else
+                                {
+                                    // Отрисовка PBR.
+                                    DrawPixelLDR(bitmap, x, y, shadeValue);
+                                    window.lbPBR.Content = "Yes";
+                                }
                             }
                         }
                     }

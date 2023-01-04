@@ -15,12 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="objects\hollow.obj" />
-    <Content Include="objects\hollowknight.obj" />
-    <Content Include="objects\sword.obj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
   </ItemGroup>
